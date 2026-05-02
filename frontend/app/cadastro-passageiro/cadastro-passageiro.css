@@ -2,20 +2,26 @@
   min-height: 100vh;
   display: flex;
   font-family: Arial, sans-serif;
+  position: relative;
+  background: #f8f6f2;
+  padding-top: 96px;
 }
 
 
 .header-cadastro {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  padding: 30px 90px;
+  width: 100%;
+  padding: 22px 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 10;
-  background: #f5f1ec;
+  z-index: 20;
+  background: rgba(245, 241, 236, 0.98);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* LOGO */
@@ -25,17 +31,10 @@
   gap: 12px;
 }
 
-.dot {
-  width: 36px;
-  height: 36px;
-  background: #D94f2b;
-  border-radius: 50%;
-}
-
-.logo h1 {
-  font-size: 26px;
-  font-weight: 300;
-  color: #D94f2b;
+.logo img {
+  height: 52px;
+  width: auto;
+  display: block;
 }
 
 .back-link {
@@ -44,11 +43,15 @@
   text-decoration: none;
 }
 
+.back-link:hover {
+  color: #d94f2b;
+}
+
 
 .left-panel {
   width: 45%;
   background: #D94f2b;
-  padding: 140px 90px 80px 90px;
+  padding: 160px 90px 80px 90px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -58,8 +61,8 @@
 
 .badge {
   background: rgba(255,255,255,0.2);
-  padding: 10px 20px;
-  border-radius: 20px;
+  padding: 12px 24px;
+  border-radius: 24px;
   width: fit-content;
   margin-bottom: 40px;
 }
@@ -67,49 +70,54 @@
 .badge p {
   margin: 0;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.8px;
 }
 
 
 .left-panel h2 {
-  font-size: 60px;
-  font-weight: 500;
-  line-height: 1.1;
-  margin-bottom: 30px;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.08;
+  margin-bottom: 24px;
+  max-width: 520px;
 }
 
 
 .left-panel p {
   font-size: 16px;
-  max-width: 400px;
+  max-width: 420px;
+  line-height: 1.7;
 }
 
 
 .right-panel {
   width: 55%;
   background: #f8f6f2;
-  padding: 140px 90px 80px 90px;
+  padding: 160px 90px 80px 90px;
   display: flex;
   flex-direction: column;
 }
 
 
 .form-header h1 {
-  font-size: 56px;
-  font-weight: 500;
+  font-size: 42px;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
 .form-header p {
-  color: #777;
+  color: #555;
   font-size: 16px;
+  line-height: 1.7;
 }
 
 
 .form-grid {
-  display: flex;
-  flex-direction: column;
-  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 22px;
 }
 
 .form-group {
@@ -122,52 +130,122 @@
   font-size: 12px;
   color: #777;
   margin-bottom: 8px;
+  letter-spacing: 0.8px;
 }
 
 .form-group input {
-  background: #F5F1EC;
-  padding: 18px;
-  border: none;
+  background: #FFFFFF;
+  padding: 18px 20px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 16px;
   font-size: 16px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus {
+  border-color: #d94f2b;
+  box-shadow: 0 0 0 4px rgba(217, 79, 43, 0.08);
 }
 
 .error-text {
   font-size: 12px;
-  color: red;
-  margin-top: 5px;
+  color: #d92e1c;
+  margin-top: 8px;
 }
 
 
 .submit-btn {
-  margin-top: 20px;
+  margin-top: 24px;
   padding: 18px;
   border-radius: 16px;
   border: none;
   background: #D94f2b;
   color: white;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
   width: 100%;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
+
+.submit-btn:hover:not(:disabled) {
+  background: #bf4125;
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .login-link {
   text-align: center;
   font-size: 14px;
   color: #777;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .login-link a {
   color: #D94f2b;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .left-footer {
   margin-top: auto;
   padding-top: 60px;
-  font-size: 11px;
-  opacity: 0.6;
-  letter-spacing: 0.5px;
+  font-size: 12px;
+  opacity: 0.75;
+  letter-spacing: 0.7px;
+}
+
+@media (max-width: 1100px) {
+  .cadastro-passageiro {
+    flex-direction: column;
+  }
+
+  .left-panel,
+  .right-panel {
+    width: 100%;
+    padding: 120px 40px 60px 40px;
+  }
+
+  .header-cadastro {
+    padding: 24px 40px;
+  }
+
+  .left-panel h2 {
+    font-size: 38px;
+  }
+
+  .form-header h1 {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 760px) {
+  .header-cadastro {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel,
+  .right-panel {
+    padding: 100px 24px 60px 24px;
+  }
+
+  .left-panel h2 {
+    font-size: 32px;
+  }
+
+  .form-header h1 {
+    font-size: 32px;
+  }
 }

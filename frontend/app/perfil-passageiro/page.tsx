@@ -6,9 +6,8 @@ export default function PerfilPassageiro(){
     return(
         <div className="perfil-passageiro">
             <header className="header-perfil">
-                <div className="logo ">
-                    <div className="dot"></div>
-                    <h1>AgresteGo</h1>
+                <div className="logo">
+                    <img src="/logos/2-removebg-preview.png" alt="Logotipo AgresteGo" />
                 </div>
                 <nav className="links">
                 <Link href={"/"}>Início</Link>
