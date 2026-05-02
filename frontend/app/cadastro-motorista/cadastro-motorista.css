@@ -1,0 +1,237 @@
+.cadastro-motorista {
+    min-height: 100vh;
+    display: flex;
+    background-color: var(--background);
+}
+
+.header-cadastro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 30px 90px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        .dot {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: var(--primary);
+            font-family: Georgia, serif;
+        }
+    }
+
+    .back-link {
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        &:hover {
+            color: var(--primary);
+        }
+    }
+}
+
+.left-panel {
+    width: 40%;
+    background: linear-gradient(135deg, var(--secondary) 0%, #4F9B6A 100%);
+    padding: 80px 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    min-height: 100vh;
+
+    .badge {
+        background-color: rgba(79, 155, 106, 0.8);
+        padding: 12px 24px;
+        border-radius: 18px;
+        width: fit-content;
+        margin-bottom: 40px;
+
+        p {
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin: 0;
+        }
+    }
+
+    h2 {
+        font-size: 56px;
+        font-family: Georgia, serif;
+        color: white;
+        line-height: 1.1;
+        margin-bottom: 40px;
+    }
+
+    p {
+        font-size: 18px;
+        color: rgba(229, 242, 234, 0.9);
+        line-height: 1.6;
+        margin: 0;
+    }
+}
+
+.right-panel {
+    width: 60%;
+    padding: 120px 90px;
+    display: flex;
+    flex-direction: column;
+
+    .form-header {
+        margin-bottom: 40px;
+
+        h1 {
+            font-size: 42px;
+            font-family: Georgia, serif;
+            color: #2B2B2B;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #777;
+            margin: 0;
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+
+        &.single-column {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+
+            label {
+                font-size: 12px;
+                color: #777;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                font-weight: 500;
+            }
+
+            input, select {
+                padding: 16px 20px;
+                border: 1px solid #E8DFD5;
+                border-radius: 14px;
+                background-color: #EFE7DF;
+                font-size: 14px;
+                color: #2B2B2B;
+                transition: all 0.3s ease;
+
+                &::placeholder {
+                    color: #999;
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: var(--primary);
+                    background-color: white;
+                }
+
+                &.error {
+                    border-color: #e74c3c;
+                    background-color: #fdf2f2;
+                }
+            }
+
+            .helper-text {
+                font-size: 12px;
+                color: #999;
+                margin-top: 4px;
+            }
+
+            .error-text {
+                font-size: 12px;
+                color: #e74c3c;
+                margin-top: 4px;
+            }
+        }
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 20px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+
+        &:hover:not(:disabled) {
+            background-color: #A84A32;
+            transform: translateY(-2px);
+        }
+
+        &:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+    }
+
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+    }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1024px) {
+    .cadastro-motorista {
+        flex-direction: column;
+    }
+
+    .left-panel {
+        width: 100%;
+        min-height: auto;
+        padding: 60px 30px;
+    }
+
+    .right-panel {
+        width: 100%;
+        padding: 60px 30px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
