@@ -1,0 +1,42 @@
+.perfil-passageiro{
+    background: #f8f4f0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+.header-perfil{
+    background: #FFFFFF;
+    padding: 20PX 60PX;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom:1px solid #e8e4df ;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    gap:12px;
+}
+.dot{
+    width: 22px;
+    height: 22px;
+    background: #D94f2b;
+    border-radius: 50%;
+
+}
+.logo h1{
+    font-size: 28px;
+    font-weight: 700;
+    color:#D94f2b
+}
+.links{
+    display: flex;
+    gap:12px;
+}
+.links a{
+    padding: 10px 24px;
+    border-radius: 50px;
+    border:1px solid#ddd;
+    text-decoration: none;
+    color:#D94f2b;
+    font-size: 15px;
+}
