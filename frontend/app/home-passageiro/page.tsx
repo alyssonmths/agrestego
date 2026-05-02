@@ -127,8 +127,7 @@ export default function HomePassageiro() {
     <div className="home-passageiro">
       <header className="header-passageiro">
         <div className="logo-section">
-          <div className="dot"></div>
-          <h1>AgresteGo</h1>
+          <img src="/logos/2-removebg-preview.png" alt="Logotipo AgresteGo" />
         </div>
 
         <nav className="nav-links">

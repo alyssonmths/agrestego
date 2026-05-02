@@ -183,8 +183,7 @@ export default function CadastroMotorista() {
         <div className="cadastro-motorista">
             <header className="header-cadastro">
                 <div className="logo">
-                    <div className="dot"></div>
-                    <h1>AgresteGo</h1>
+                    <img src="/logos/2-removebg-preview.png" alt="Logotipo AgresteGo" />
                 </div>
                 <Link href="/" className="back-link">
                     ← Voltar ao início

@@ -5,8 +5,11 @@ export default function Home() {
   return (
     <>
       <nav className="navbar-home">
-        <h1>Agreste Go</h1>
-        <p>● Rodando no agreste</p>
+        <img src="logos/2-removebg-preview.png" alt="Logotipo" />
+        <ul>
+          <li><Link href="/">Início</Link></li>
+          <li><Link href="#create-account">Cadastre-se</Link></li>
+        </ul>
       </nav>
 
       <section className="hero">
@@ -16,29 +19,29 @@ export default function Home() {
           </div>
           <h1>Pegue carona com quem conhece <span style={{ color: 'var(--primary)' }}>cada atalho.</span></h1>
           <p>O Agreste Go conecta você a vizinhos profissionais que vivem e entendem a nossa terra. Preço justo, trajeto direto, sem surpresa nenhuma.</p>
+
+          <section className="stats">
+            <div className="stat-item">
+              <div className="number">100%</div>
+              <div className="label">Motoristas locais</div>
+            </div>
+            <div className="stat-item">
+              <div className="number">32+</div>
+              <div className="label">Cidades cobertas</div>
+            </div>
+            <div className="stat-item">
+              <div className="number">0</div>
+              <div className="label">Tarifa surpresa</div>
+            </div>
+          </section>
         </div>
 
         <div className="image-container">
-          <img src="https://picsum.photos/900/500" alt="Imagem do banner inicial" />
+          <img src="background-hero.jpg" alt="Imagem do banner inicial" />
           <div className="security-badge">
             <div className="dot"></div>
             <p>Segurança verificada<span>Toda corrida monitorada</span></p>
           </div>
-        </div>
-      </section>
-
-      <section className="stats">
-        <div className="stat-item">
-          <div className="number">100%</div>
-          <div className="label">Motoristas locais</div>
-        </div>
-        <div className="stat-item">
-          <div className="number">32+</div>
-          <div className="label">Cidades cobertas</div>
-        </div>
-        <div className="stat-item">
-          <div className="number">0</div>
-          <div className="label">Tarifa surpresa</div>
         </div>
       </section>
 
@@ -49,7 +52,7 @@ export default function Home() {
         </div>
 
         <div className="cta-cards">
-          <div className="card">
+          <div id="create-account" className="card">
             <h3>Crie sua conta</h3>
             <p className="subtitle">Como você quer usar?</p>
             <div className="button-group">
