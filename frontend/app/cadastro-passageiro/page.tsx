@@ -1,94 +1,149 @@
 "use client";
 
+import { useState, FormEvent } from "react";
+import Link from "next/link";
+import "./cadastro-passageiro.css";
+
 export default function CadastroPassageiro() {
-const inputStyle = {
-  background: "#F1ECE6",
-  padding: "16px",
-  border: "none",
-  borderRadius: "50px",
-  marginBottom: "24px",
-  fontSize: "16px",
-  width: "600px"
-};
-const labelStyle = {
-  fontSize: "14px",
-  color: "#777",
-  fontWeight: "500",
-  marginBottom: "8px"
-};
-const buttonStyle = {
-  background: "#CC6A43",
-  color: "white",
-  padding: "20px",
-  border: "none",
-  borderRadius: "50px",
-  fontSize: "18px",
-  width: "600px",
-  fontWeight: "bold",
-  cursor: "pointer"
-};
+  const [formData, setFormData] = useState({
+    nome: "",
+    email: "",
+    celular: "",
+    senha: "",
+  });
+
+  const [errors, setErrors] = useState<any>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function handleChange(field: string, value: string) {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
+    if (errors[field]) {
+      setErrors((prev: any) => ({ ...prev, [field]: "" }));
+    }
+  }
+
+  function validate() {
+    let newErrors: any = {};
+
+    if (!formData.nome) newErrors.nome = "Nome obrigatório";
+    if (!formData.email.includes("@")) newErrors.email = "Email inválido";
+    if (formData.celular.length < 15) newErrors.celular = "Celular inválido";
+    if (formData.senha.length < 8) newErrors.senha = "Mínimo 8 caracteres";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+
+    setTimeout(() => {
+      alert("Cadastro realizado!");
+      setIsSubmitting(false);
+    }, 1000);
+  }
 
   return (
-    <main style={{display:"flex",minHeight:"100vh"}}>
+    <div className="cadastro-passageiro">
 
-        <section style={{display:"flex",
-            flexDirection:"column",
-            flex:"1",
-             background:"#CC6A43",
-              color:"white",
-              padding:"80px",
-              justifyContent: "space-between"}}>
-                
-            <div>
-           <header style={{display:"flex",alignItems:"center", background:"white", gap:"12px", padding:"24px 40px", }}>
-            <h1>AgresteGo</h1>
-           <span style={{background:"#CC6A43",
-            color: "white",
-            padding: "8px 16px",
-            borderRadius: "20px",
-            width: "fit-content",
-            fontSize:"16px"}}>PARA PASSAGEIROS</span>
-             </header>
+      {/* HEADER */}
+      <header className="header-cadastro">
+        <div className="logo">
+          <div className="dot"></div>
+          <h1>AgresteGo</h1>
+        </div>
+
+        <Link href="/" className="back-link">
+          ← Voltar ao início
+        </Link>
+      </header>
+
+      {/* ESQUERDA */}
+      <div className="left-panel">
+        <div className="badge">
+          <p>PARA PASSAGEIROS</p>
+        </div>
+
+        <h2>
+          Chame uma corrida com a confiança de quem é da terra.
+        </h2>
+
+        <p>
+          Cadastro rápido para começar a viajar com motoristas locais verificados.
+        </p>
+        <p className="left-footer">AGRESTE GO · DAQUI PRA ALI, SEM ARRODEIO</p>
+      </div>
+
+      {/* DIREITA */}
+      <div className="right-panel">
+
+        <div className="form-header">
+          <h1>Cadastro de passageiro</h1>
+          <p>Em menos de um minuto você está pronto para a primeira corrida.</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+
+          <div className="form-grid single-column">
+            <div className="form-group">
+              <label>NOME COMPLETO</label>
+              <input
+              placeholder="Maria Bonita"
+              value={formData.nome}
+              onChange={(e) => handleChange("nome", e.target.value)}
+              />
+              {errors.nome && <div className="error-text">{errors.nome}</div>}
             </div>
-            
-            <div>
-            <p style={{fontSize: "52px",
-            fontWeight: "500",
-            lineHeight: "1.1"}}>Chame uma corrida com a confiança de quem é da terra.</p>
-            <p style={{marginTop:"32px"}}>Cadastro rápido para começar a viajar com motoristas locais verificados.</p>
+          </div>
+
+          <div className="form-grid">
+            <div className="form-group">
+              <label>EMAIL</label>
+              <input
+              placeholder="voce@email.com"
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              />
+              {errors.email && <div className="error-text">{errors.email}</div>}
             </div>
 
-            <small>
-            <p >AGRESTE GO. DAQUI PRA ALI, SEM ARRODEIO.</p>
-            </small>
-        </section>
+            <div className="form-group">
+              <label>CELULAR</label>
+              <input  
+              placeholder="(81) 90000-0000"
+              value={formData.celular}
+              onChange={(e) => handleChange("celular", e.target.value)}/>
+              {errors.celular && <div className="error-text">{errors.celular}</div>}
+            </div>
+          </div>
 
+          <div className="form-grid single-column">
+            <div className="form-group">
+              <label>SENHA</label>
+              <input 
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              value={formData.senha}
+              onChange={(e) => handleChange("senha", e.target.value)}/>
+             
+              {errors.senha && <div className="error-text">{errors.senha}</div>}
+            </div>
+          </div>
 
-        <section style={{display: "flex",flexDirection:"column",flex:"1", background:"#f8f6f2", color:"black", padding:"80px"}}>
-         <p style={{alignSelf: "flex-end", fontSize:"14px"}}>← Voltar ao início</p>
-
-        <h2 style={{fontSize: "56px",fontWeight: "500"}}>Cadastro de passageiro</h2>
-
-        <p>Em menos de um minuto você está pronto para a primeira corrida.</p>
-
-        <form style={{display:"flex", flexDirection:"column",marginTop: "40px"}}>
-            <label style={labelStyle}>NOME COMPLETO</label>
-            <input  style={inputStyle}
-             type="text"placeholder="Maria"maxLength={50}/>
+          <button className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? "Criando..." : "Criar minha conta"}
+            </button>
             
-            <label style={labelStyle}>EMAIL</label>
-            <input style={inputStyle} type="email" placeholder="voce@gmail.com" maxLength={50}/>
-            
-            <label style={labelStyle}>CELULAR(WHATSAPP)</label>
-            <input style={inputStyle} type="text" placeholder="(81)90000-0000"maxLength={15}/>
-            <label style={labelStyle}>SENHA</label>
-            <input style={inputStyle} type="password" placeholder="No mínimo 8 caracteres" minLength={8} maxLength={50}/>
-            
-            <button style={buttonStyle} type="submit">Criar minha conta</button>
+            <p className="login-link">Já tem conta? <Link href="/login">Entrar</Link>
+            </p>
 
         </form>
-        </section>
-
-    </main>
+      </div>
+    </div>
   );
 }

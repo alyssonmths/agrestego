@@ -1,0 +1,173 @@
+.cadastro-passageiro {
+  min-height: 100vh;
+  display: flex;
+  font-family: Arial, sans-serif;
+}
+
+
+.header-cadastro {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 30px 90px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  background: #f8f6f2;
+}
+
+/* LOGO */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dot {
+  width: 36px;
+  height: 36px;
+  background: #CC6A43;
+  border-radius: 50%;
+}
+
+.logo h1 {
+  font-size: 26px;
+  font-weight: 300;
+  color: #CC6A43;
+}
+
+.back-link {
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+}
+
+
+.left-panel {
+  width: 45%;
+  background: #CC6A43;
+  padding: 140px 90px 80px 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+}
+
+
+.badge {
+  background: rgba(255,255,255,0.2);
+  padding: 10px 20px;
+  border-radius: 20px;
+  width: fit-content;
+  margin-bottom: 40px;
+}
+
+.badge p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+.left-panel h2 {
+  font-size: 60px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin-bottom: 30px;
+}
+
+
+.left-panel p {
+  font-size: 16px;
+  max-width: 400px;
+}
+
+
+.right-panel {
+  width: 55%;
+  background: #f8f6f2;
+  padding: 140px 90px 80px 90px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.form-header h1 {
+  font-size: 56px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.form-header p {
+  color: #777;
+  font-size: 16px;
+}
+
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  background: #F5F1EC;
+  padding: 18px;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+}
+
+.error-text {
+  font-size: 12px;
+  color: red;
+  margin-top: 5px;
+}
+
+
+.submit-btn {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 16px;
+  border: none;
+  background: #C65D3B;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+.login-link {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  margin-top: 16px;
+}
+
+.login-link a {
+  color: #C65D3B;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.left-footer {
+  margin-top: auto;
+  padding-top: 60px;
+  font-size: 11px;
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+}
