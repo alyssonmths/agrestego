@@ -21,69 +21,23 @@ export default function CadastroMotorista() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
-    const validateForm = (): boolean => {
-        const newErrors: FormErrors = {}
+    function validate(): boolean {
+        const newErrors: FormErrors = {};
 
-        // Nome
-        if (!formData.nome.trim()) {
-            newErrors.nome = 'Nome completo é obrigatório'
-        } else if (formData.nome.trim().length < 3) {
-            newErrors.nome = 'Nome deve ter pelo menos 3 caracteres'
-        }
+        if (!formData.nome) newErrors.nome = "Nome obrigatório";
+        if (!(/\S+@\S+\.\S+/).test(formData.email)) newErrors.email = "Email inválido";
+        if (!(/^\(\d{2}\)\s\d{5}-\d{4}$/).test(formData.celular)) newErrors.celular = "Formato: (81) 90000-0000";
+        if (formData.cnh.length !== 11) newErrors.cnh = "CNH deve ter 11 dígitos";
+        if (formData.veiculo.trim().length < 3) newErrors.veiculo = "Descrição do veículo muito curta";
+        if (!/^[A-Z]{3}-\d[A-Z]\d{2}$/.test(formData.placa.toUpperCase())) newErrors.placa = "Formato: ABC-1D23";
+        if (formData.senha.length < 8) newErrors.senha = "Senha deve ter pelo menos 8 caracteres";
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.senha)) newErrors.senha = "Senha deve conter maiúscula, minúscula e número";
 
-        // Email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email é obrigatório'
-        } else if (!emailRegex.test(formData.email)) {
-            newErrors.email = 'Email inválido'
-        }
-
-        // Celular
-        const celularRegex = /^\(\d{2}\)\s\d{5}-\d{4}$/
-        if (!formData.celular.trim()) {
-            newErrors.celular = 'Celular é obrigatório'
-        } else if (!celularRegex.test(formData.celular)) {
-            newErrors.celular = 'Formato: (81) 90000-0000'
-        }
-
-        // CNH
-        const cnhRegex = /^\d{11}$/
-        if (!formData.cnh.trim()) {
-            newErrors.cnh = 'CNH é obrigatória'
-        } else if (!cnhRegex.test(formData.cnh.replace(/\D/g, ''))) {
-            newErrors.cnh = 'CNH deve ter 11 dígitos'
-        }
-
-        // Veículo
-        if (!formData.veiculo.trim()) {
-            newErrors.veiculo = 'Veículo é obrigatório'
-        } else if (formData.veiculo.trim().length < 3) {
-            newErrors.veiculo = 'Descrição do veículo muito curta'
-        }
-
-        // Placa
-        const placaRegex = /^[A-Z]{3}-\d[A-Z]\d{2}$/
-        if (!formData.placa.trim()) {
-            newErrors.placa = 'Placa é obrigatória'
-        } else if (!placaRegex.test(formData.placa.toUpperCase())) {
-            newErrors.placa = 'Formato: ABC-1D23'
-        }
-
-        // Senha
-        if (!formData.senha) {
-            newErrors.senha = 'Senha é obrigatória'
-        } else if (formData.senha.length < 8) {
-            newErrors.senha = 'Senha deve ter pelo menos 8 caracteres'
-        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.senha)) {
-            newErrors.senha = 'Senha deve conter maiúscula, minúscula e número'
-        }
-
-        setErrors(newErrors)
-        return Object.keys(newErrors).length === 0
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     }
 
-    const formatCelular = (value: string): string => {
+    function formatCelular(value: string): string {
         const cleaned = value.replace(/\D/g, '')
         if (cleaned.length <= 2) return `(${cleaned}`
         if (cleaned.length <= 6) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`
@@ -91,7 +45,7 @@ export default function CadastroMotorista() {
         return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`
     }
 
-    const formatPlaca = (value: string): string => {
+    function formatPlaca(value: string): string {
         const cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
         if (cleaned.length <= 3) return cleaned
         if (cleaned.length <= 4) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`
@@ -100,17 +54,17 @@ export default function CadastroMotorista() {
     }
 
     const handleInputChange = (field: keyof FormData, value: string) => {
-        let formattedValue = value
+        let formattedValue = value;
 
         if (field === 'celular') {
-            formattedValue = formatCelular(value)
+            formattedValue = formatCelular(value);
         } else if (field === 'placa') {
-            formattedValue = formatPlaca(value)
+            formattedValue = formatPlaca(value);
         } else if (field === 'cnh') {
-            formattedValue = value.replace(/\D/g, '').slice(0, 11)
+            formattedValue = value.replace(/\D/g, '').slice(0, 11);
         }
 
-        setFormData(prev => ({ ...prev, [field]: formattedValue }))
+        setFormData(prev => ({ ...prev, [field]: formattedValue }));
 
         // Limpar erro do campo quando usuário começa a digitar
         if (errors[field]) {
@@ -119,14 +73,12 @@ export default function CadastroMotorista() {
     }
 
     const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault()
-        setSubmitMessage(null)
+        e.preventDefault();
+        setSubmitMessage(null);
 
-        if (!validateForm()) {
-            return
-        }
+        if (!validate()) return;
 
-        setIsSubmitting(true)
+        setIsSubmitting(true);
 
         try {
             // TODO: Integrar com API do backend
@@ -175,7 +127,7 @@ export default function CadastroMotorista() {
                 text: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.'
             })
         } finally {
-            setIsSubmitting(false)
+            setIsSubmitting(false);
         }
     }
 

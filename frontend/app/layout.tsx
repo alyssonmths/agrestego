@@ -9,6 +9,7 @@ export default function RootLayout({
     <html
       lang="pt-br"
       className= "h-full antialiased"
+      style={{scrollBehavior: "smooth"}}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

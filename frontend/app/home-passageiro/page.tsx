@@ -10,16 +10,16 @@ export default function HomePassageiro() {
     origem: '',
     destino: '',
     passageiros: 1
-  })
+  });
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'BOM DIA'
-    if (hour < 18) return 'BOA TARDE'
-    return 'BOA NOITE'
+    const hour = new Date().getHours();
+    if (hour < 12) return 'BOM DIA';
+    if (hour < 18) return 'BOA TARDE';
+    return 'BOA NOITE';
   }
 
   const quickDestinations = [
@@ -29,8 +29,8 @@ export default function HomePassageiro() {
   ]
 
   const handleInputChange = (field: keyof RideRequest, value: string | number) => {
-    setRideRequest(prev => ({ ...prev, [field]: value }))
-    setSubmitMessage(null) // Limpar mensagens de erro ao digitar
+    setRideRequest(prev => ({ ...prev, [field]: value }));
+    setSubmitMessage(null); // Limpar mensagens de erro ao digitar
   }
 
   const handlePassengerChange = (increment: boolean) => {
@@ -39,37 +39,37 @@ export default function HomePassageiro() {
       passageiros: increment
         ? Math.min(prev.passageiros + 1, 4) // Máximo 4 passageiros
         : Math.max(prev.passageiros - 1, 1) // Mínimo 1 passageiro
-    }))
+    }));
   }
 
   const validateForm = (): boolean => {
     if (!rideRequest.origem.trim()) {
-      setSubmitMessage({ type: 'error', text: 'Por favor, informe a origem da viagem.' })
-      return false
+      setSubmitMessage({ type: 'error', text: 'Por favor, informe a origem da viagem.' });
+      return false;
     }
 
     if (!rideRequest.destino.trim()) {
-      setSubmitMessage({ type: 'error', text: 'Por favor, informe o destino da viagem.' })
-      return false
+      setSubmitMessage({ type: 'error', text: 'Por favor, informe o destino da viagem.' });
+      return false;
     }
 
     if (rideRequest.origem.trim().toLowerCase() === rideRequest.destino.trim().toLowerCase()) {
-      setSubmitMessage({ type: 'error', text: 'Origem e destino não podem ser iguais.' })
-      return false
+      setSubmitMessage({ type: 'error', text: 'Origem e destino não podem ser iguais.' });
+      return false;
     }
 
-    return true
+    return true;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitMessage(null)
+    e.preventDefault();
+    setSubmitMessage(null);
 
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       // TODO: Integrar com API do backend
@@ -83,44 +83,44 @@ export default function HomePassageiro() {
           tipo: 'passageiro',
           timestamp: new Date().toISOString()
         }),
-      })
+      });
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         setSubmitMessage({
           type: 'success',
           text: `Corrida solicitada! Procurando motoristas próximos... ID: ${data.corridaId || 'ABC123'}`
-        })
+        });
 
         setRideRequest({
           origem: '',
           destino: '',
           passageiros: 1
-        })
+        });
 
         // TODO: Redirecionar para tela de acompanhamento da corrida
         setTimeout(() => {
           window.location.href = '/acompanhar-corrida'
-        }, 3000)
+        }, 3000);
 
       } else {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Erro ao solicitar corrida')
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao solicitar corrida');
       }
 
     } catch (error) {
-      console.error('Erro na solicitação:', error)
+      console.error('Erro na solicitação:', error);
       setSubmitMessage({
         type: 'error',
         text: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.'
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
   const selectQuickDestination = (destination: string) => {
-    setRideRequest(prev => ({ ...prev, destino: destination }))
+    setRideRequest(prev => ({ ...prev, destino: destination }));
   }
 
   return (
