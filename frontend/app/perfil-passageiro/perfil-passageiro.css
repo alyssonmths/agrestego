@@ -63,5 +63,162 @@
         flex: 1 1 100%;
         text-align: center;
     }
+} 
+
+.titulo-perfil{
+    padding: 40px 60px 20px 60px;
+}
+.titulo-perfil h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #1F1F1F;
+}
+.titulo-perfil p {
+    font-size: 16px;
+    color: #555454;
+}
+.cards-container{
+    display: flex;
+    gap: 20px;
+    padding: 30px 60px;
+}
+.card{
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 32px;
+    flex:1;
+}
+.card header{
+    display: flex;
+    align-items: center;
+    gap:16px;
+    margin-bottom: 28px;
+}
+.avatar{
+    width: 68px;
+    height: 68px;
+    background: #E05A3A;
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 32px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card-header h2{
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.card-header p{
+    font-size: 13px;
+    font-weight: 400;
+    color: #888888;
+}
+.form-group{
+    display:flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+.form-group label{
+    font-size: 11.5px;
+    color: #666666;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+.form-group input{
+    background: #F8F4F0;
+    padding: 16px 18px;
+    border-radius: 16px;
+    font-size: 16.5px;
+    color: #1F1F1F;
+    border:none;
+}
+.btn-salvar{
+    margin-top: 24px;
+    width: 100%;
+    padding: 18px;
+    background: #E05A3A;
+    color: #FFFFFF;
+    font-size: 17.5px;
+    border: none;
+    border-radius: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.badge-numero {
+    margin-left: auto;
+    background: #e8e4df;
+    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 50px;
 }
 
+.endereco-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #f8f4f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.endereco-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.endereco-item strong {
+    font-size: 15px;
+    color: #1f1f1f;
+}
+
+.endereco-item span {
+    font-size: 13px;
+    color: #777;
+}
+
+.endereco-acoes {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.endereco-acoes button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.adicionar-box {
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+}
+
+.adicionar-titulo {
+    color: #3a9e5f;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 16px;
+}
+
+.btn-adicionar {
+    margin-top: 8px;
+    padding: 14px 28px;
+    background: #3a9e5f;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}

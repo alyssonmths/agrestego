@@ -110,6 +110,7 @@ export default function CadastroPassageiro() {
               <label>NOME COMPLETO</label>
               <input
                 placeholder="Maria Bonita"
+                maxLength={50}
                 value={formData.nome}
                 onChange={(e) => handleChange("nome", e.target.value)}
               />
@@ -122,6 +123,7 @@ export default function CadastroPassageiro() {
               <label>EMAIL</label>
               <input
                 placeholder="voce@email.com"
+                maxLength={50}
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
               />
@@ -148,6 +150,7 @@ export default function CadastroPassageiro() {
               <input
                 type="password"
                 placeholder="Mínimo 8 caracteres"
+                maxLength={20}
                 value={formData.senha}
                 onChange={(e) => handleChange("senha", e.target.value)} />
 
