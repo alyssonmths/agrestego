@@ -106,3 +106,14 @@ moderno, incluindo: - Arquitetura cliente-servidor - Consumo de APIs -
 Modelagem de banco de dados - Autenticação e segurança
 
 ------------------------------------------------------------------------
+
+##  Figma
+
+As telas em png encontram-se no diretório /figma para acesso rápido.
+Para acesso completo, acesse o link:
+
+https://www.figma.com/design/goQyAaFmdQcBa35T5EaNGk/Agreste-Go---Design?node-id=0-1&t=lIILLzCSBzuWoIY7-1
+
+## Diagrama de casos de uso
+
+O diagrama de casos de uso pode ser acessado [aqui](./casos_uso/diagrama_casos_uso.pdf).
