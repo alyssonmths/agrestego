@@ -1,8 +1,44 @@
 "use client";
  import Link from "next/link";
  import "./perfil-passageiro.css";
+ import {useState, FormEvent} from "react";
 
 export default function PerfilPassageiro(){
+    const [formData, setFormData]=useState({
+        nome:"",
+        email:"",
+        celular:"",
+    })
+    const [errors, setErrors]=useState<any>({});
+    const [isSubmitting, setIsSubmitting]=useState(false);
+       function handleChange(field: string, value: string) {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+        if (errors[field]) {
+            setErrors((prev: any) => ({ ...prev, [field]: "" }));
+        }
+    }
+
+    function validate() {
+        let newErrors: any = {};
+
+        if (!formData.nome) newErrors.nome = "Nome obrigatório";
+        if (!formData.email.includes("@")) newErrors.email = "Email inválido";
+        if (formData.celular.length < 10) newErrors.celular = "Celular inválido";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
+
+    function handleSubmit(e: FormEvent) {
+        e.preventDefault();
+        if (!validate()) return;
+        setIsSubmitting(true);
+        setTimeout(() => {
+            alert("Alterações salvas!");
+            setIsSubmitting(false);
+        }, 1000);
+    }
+
     return(
         <div className="perfil-passageiro">
             <header className="header-perfil">
@@ -29,27 +65,40 @@ export default function PerfilPassageiro(){
                         <p>Mantenha seus dados em dia.</p>
                         </div>
                     </header>
-            
+        <form onSubmit={handleSubmit}>
             <div className="form-group">
                 <label>NOME COMPLETO</label>
                 <input 
                 placeholder="Maria Bonita"
                 maxLength={50}
+                 value={formData.nome}
+                onChange={(e) => handleChange("nome", e.target.value)}
                 ></input>
+                {errors.email && <p className="error-text">{errors.email}</p>}
             </div>
             <div className="form-group">
                 <label>EMAIL</label>
                 <input
                 placeholder="maria@email.com"
-                maxLength={50}></input>
+                maxLength={50}
+                value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
+            ></input>
+            {errors.email && <p className="error-text">{errors.email}</p>}
             </div>
+
             <div className="form-group">
                 <label>CELULAR</label>
                 <input
                 placeholder="(81)99999-0000"
-                maxLength={15}></input>
+                maxLength={15}
+                onChange={(e) => handleChange("celular", e.target.value)}
+              ></input>
+                {errors.celular && <p className="error-text">{errors.celular}</p>}
+
             </div>
             <button className="btn-salvar">Salvar alterações</button>
+            </form>
         
             </article>
 
