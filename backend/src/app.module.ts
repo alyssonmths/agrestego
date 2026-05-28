@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { PrismaService } from './database/prisma.service';
 import { PassageiroModule } from './passageiro/passageiro.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { PassageiroModule } from './passageiro/passageiro.module';
       isGlobal: true,
     }),
     PassageiroModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
