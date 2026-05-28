@@ -7,7 +7,8 @@ export class PassageiroService {
 
   constructor(private readonly prisma: PrismaService) { }
 
-  create(createPassageiroDto: CreatePassageiroDto): Promise<any> {
+
+  create(createPassageiroDto: CreatePassageiroDto) {
     return this.prisma.passageiro.create({
       data: createPassageiroDto,
     });
