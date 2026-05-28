@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { PrismaService } from './database/prisma.service';
 import { PassageiroModule } from './passageiro/passageiro.module';
+import { MotoristaModule } from './motorista/motorista.module';
+import { CorridaModule } from './corrida/corrida.module';
 
 @Module({
   imports: [
@@ -11,6 +13,8 @@ import { PassageiroModule } from './passageiro/passageiro.module';
       isGlobal: true,
     }),
     PassageiroModule,
+    MotoristaModule,
+    CorridaModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
