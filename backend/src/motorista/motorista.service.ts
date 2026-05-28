@@ -12,19 +12,8 @@ export class MotoristaService {
       data: createMotoristaDto,
     });
   }
-  findAll(){
-    return this.prisma.motorista.findMany();
-  }
 
   findOne(id: number) {
     return this.prisma.motorista.findUnique({where: {id}});
   }
-  update( id: number, updateMotoristaDto: UpdateMotoristaDto){
-    return this.prisma.motorista.update({where: {id}, data: updateMotoristaDto});
-  }
-
-  remove(id: number){
-    return this.prisma.motorista.delete({where: {id}});
-  }
- 
 }

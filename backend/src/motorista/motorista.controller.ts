@@ -12,11 +12,4 @@ export class MotoristaController {
     return this.motoristaService.create(createMotoristaDto);
   }
 
-
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.motoristaService.findOne(+id);
-  }
-
 }

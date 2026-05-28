@@ -9,11 +9,6 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get()
   getHello() {
-    return this.appService.getUsers();
-  }
-
-  @Post('users')
-  createUser() {
-    return this.appService.createUser();
+    return this.appService.getHello();
   }
 }

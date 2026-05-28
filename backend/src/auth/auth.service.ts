@@ -10,8 +10,8 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) { }
 
-    async signIn(username: string, pass: string): Promise<{access_token: string}> {
-        const user = await this.passageiroService.findOne(username);
+    async signIn(email: string, pass: string): Promise<{access_token: string}> {
+        const user = await this.passageiroService.findOne(email);
 
         if (user?.senha !== pass || !user) {
             throw new NotFoundException('Usuário ou senha inválidos');
