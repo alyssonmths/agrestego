@@ -5,7 +5,7 @@ import { PrismaService } from "src/database/prisma.service";
 
 @Injectable()
 export class MotoristaService {
-  constructor(private readonly prisma: PrismaService){ }
+  constructor(private readonly prisma: PrismaService) { }
 
   create(createMotoristaDto: CreateMotoristaDto) {
     return this.prisma.motorista.create({
@@ -13,7 +13,7 @@ export class MotoristaService {
     });
   }
 
-  findOne(id: number) {
-    return this.prisma.motorista.findUnique({where: {id}});
+  findOne(email: string) {
+    return this.prisma.motorista.findUnique({ where: { email } });
   }
 }
