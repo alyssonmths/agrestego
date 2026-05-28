@@ -35,15 +35,31 @@ model Motorista {
 }
 
 model Corrida {
-  id           Int        @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   passageiroId Int
-  motoristaId  Int
-  origem       String
-  destino      String
-  status       String
-  inicio       DateTime   @default(now())
+  motoristaId  Int?
+  origemId     Int
+  destinoId    Int
+  origem       Bairro        @relation("CorridaOrigem", fields: [origemId], references: [id])
+  destino      Bairro        @relation("CorridaDestino", fields: [destinoId], references: [id])
+  status       StatusCorrida
+  inicio       DateTime      @default(now())
   fim          DateTime?
   valor        Float
-  passageiro   Passageiro @relation(fields: [passageiroId], references: [id])
-  motorista    Motorista  @relation(fields: [motoristaId], references: [id])
+  passageiro   Passageiro    @relation(fields: [passageiroId], references: [id])
+  motorista    Motorista?    @relation(fields: [motoristaId], references: [id])
+}
+
+enum StatusCorrida {
+  SOLICITADA
+  CANCELADA
+  INICIADA
+  FINALIZADA
+}
+
+model Bairro {
+  id             Int       @id @default(autoincrement())
+  nome           String
+  corridasOrigem Corrida[] @relation("CorridaOrigem")
+  corridasDestino Corrida[] @relation("CorridaDestino")
 }

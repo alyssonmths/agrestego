@@ -1,1 +1,3 @@
-export class CreateCorridaDto {}
+export class CreateCorridaDto {
+    
+}

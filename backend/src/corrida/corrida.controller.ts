@@ -11,24 +11,4 @@ export class CorridaController {
   create(@Body() createCorridaDto: CreateCorridaDto) {
     return this.corridaService.create(createCorridaDto);
   }
-
-  @Get()
-  findAll() {
-    return this.corridaService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.corridaService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCorridaDto: UpdateCorridaDto) {
-    return this.corridaService.update(+id, updateCorridaDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.corridaService.remove(+id);
-  }
 }
