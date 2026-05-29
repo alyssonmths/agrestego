@@ -1,5 +1,5 @@
 
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PassageiroService } from 'src/passageiro/passageiro.service';
 import { JwtService } from '@nestjs/jwt';
 import { MotoristaService } from 'src/motorista/motorista.service';
@@ -13,11 +13,12 @@ export class AuthService {
     ) { }
 
     async signIn(email: string, pass: string): Promise<{ access_token: string }> {
-
+        let role: 'passageiro' | 'motorista' = 'passageiro';
         let user = await this.passageiroService.findOne(email);
 
         if (!user) {
             user = await this.motoristaService.findOne(email);
+            role = 'motorista';
         }
 
         if (!user || user.senha !== pass) {
@@ -27,6 +28,7 @@ export class AuthService {
         const payload = {
             sub: user.id,
             email: user.email,
+            role,
         };
 
         return {

@@ -48,6 +48,7 @@ model Corrida {
   valor        Float
   passageiro   Passageiro    @relation(fields: [passageiroId], references: [id])
   motorista    Motorista?    @relation(fields: [motoristaId], references: [id])
+  avaliacao    Avaliacao?
 }
 
 enum StatusCorrida {
@@ -58,8 +59,17 @@ enum StatusCorrida {
 }
 
 model Bairro {
-  id             Int       @id @default(autoincrement())
-  nome           String
-  corridasOrigem Corrida[] @relation("CorridaOrigem")
+  id              Int       @id @default(autoincrement())
+  nome            String
+  corridasOrigem  Corrida[] @relation("CorridaOrigem")
   corridasDestino Corrida[] @relation("CorridaDestino")
+}
+
+model Avaliacao {
+  id             Int     @id @default(autoincrement())
+  notaCorrida    Int?
+  notaPassageiro Int?
+  notaMotorista  Int?
+  corridaId      Int     @unique
+  corrida        Corrida @relation(fields: [corridaId], references: [id])
 }
