@@ -49,4 +49,13 @@ export class CorridaService {
       where: { corridaId: request.corridaId }
     });
   }
+  async aceitarCorrida(id: number, motoristaId: number){
+    return this.prisma.corrida.update({
+      data:{
+        status: StatusCorrida.INICIADA,
+        motoristaId:motoristaId
+       },
+      where: { id }
+    });
+  }
 }
