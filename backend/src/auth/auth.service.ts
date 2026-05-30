@@ -40,7 +40,7 @@ export class AuthService {
         return { passageiro, access_token };
     }
 
-    async signIn(email: string, pass: string): Promise<{ access_token: string }> {
+    async signIn(email: string, pass: string): Promise<{ access_token: string, role: 'passageiro' | 'motorista' }> {
         let role: 'passageiro' | 'motorista' = 'passageiro';
         let user = await this.passageiroService.findOne(email);
 
@@ -59,8 +59,11 @@ export class AuthService {
             role,
         };
 
+        const access_token = await this.jwtService.signAsync(payload);
+
         return {
-            access_token: await this.jwtService.signAsync(payload),
+            access_token,
+            role,
         };
     }
 }
