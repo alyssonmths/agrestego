@@ -66,7 +66,7 @@ export default function CadastroPassageiro() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_URL}/passageiro`, {
+      const response = await fetch(`${API_URL}/auth/signup-passageiro`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
