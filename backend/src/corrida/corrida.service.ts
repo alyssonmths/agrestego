@@ -55,7 +55,7 @@ export class CorridaService {
         status: StatusCorrida.INICIADA,
         motoristaId:motoristaId
        },
-      where: { id }
+      where: { id: Number(id) }
     });
   }
   async finalizar(id: number) {
@@ -64,7 +64,7 @@ export class CorridaService {
             status: StatusCorrida.FINALIZADA,
             fim: new Date()
         },
-        where: { id }
+       where: { id: Number(id) }
     });
 }
 }
