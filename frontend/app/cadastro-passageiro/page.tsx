@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import "./cadastro-passageiro.css";
 import { FormData, FormErrors } from "./interfaces/form";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
 export default function CadastroPassageiro() {
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     nome: "",
     email: "",
@@ -15,6 +19,7 @@ export default function CadastroPassageiro() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [apiError, setApiError] = useState<string>("");
 
   function handleChange(field: keyof FormData, value: string) {
     let formattedValue = value;
@@ -52,17 +57,46 @@ export default function CadastroPassageiro() {
     return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setApiError("");
 
     if (!validate()) return;
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      alert("Cadastro realizado!");
+    try {
+      const response = await fetch(`${API_URL}/passageiro`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: formData.nome,
+          email: formData.email,
+          celular: formData.celular,
+          senha: formData.senha,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setApiError(data.message || "Erro ao criar conta. Tente novamente.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Salvar token no localStorage
+      localStorage.setItem("access_token", data.access_token);
+
+      // Redirecionar para a home do passageiro
+      router.push("/home-passageiro");
+    } catch (error) {
+      console.error("Erro:", error);
+      setApiError("Erro de conexão com o servidor. Tente novamente.");
       setIsSubmitting(false);
-    }, 1000);
+    }
   }
 
   return (
@@ -102,6 +136,12 @@ export default function CadastroPassageiro() {
           <h1>Cadastro de passageiro</h1>
           <p>Em menos de um minuto você está pronto para a primeira corrida.</p>
         </div>
+
+        {apiError && (
+          <div className="error-text" style={{ padding: "10px", backgroundColor: "#fee", borderRadius: "4px", marginBottom: "20px" }}>
+            {apiError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
 
