@@ -1,7 +1,85 @@
+'use client'
+
+import { FormEvent, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Toast from './components/Toast'
 import './home.css'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+
 export default function Home() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [toast, setToast] = useState<{ visible: boolean; type: 'success' | 'error'; message: string }>({
+    visible: false,
+    type: 'success',
+    message: ''
+  })
+
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ visible: true, type, message })
+  }
+
+  const closeToast = () => setToast((prev) => ({ ...prev, visible: false }))
+
+  const getRedirectPath = (role: string) => {
+    return role === 'motorista' ? '/home-motorista' : '/home-passageiro'
+  }
+
+  const parseRoleFromToken = (token: string) => {
+    try {
+      const payload = token.split('.')[1]
+      const padded = payload.padEnd(payload.length + (4 - (payload.length % 4)) % 4, '=')
+      const decoded = atob(padded.replace(/-/g, '+').replace(/_/g, '/'))
+      const parsed = JSON.parse(decoded)
+      return parsed.role || 'passageiro'
+    } catch {
+      return 'passageiro'
+    }
+  }
+
+  const handleLogin = async (event: FormEvent) => {
+    event.preventDefault()
+    setToast((prev) => ({ ...prev, visible: false }))
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Email ou senha inválidos')
+      }
+
+      const role = data.role || parseRoleFromToken(data.access_token)
+      localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem('user_role', role)
+
+      showToast('success', 'Login realizado com sucesso! Redirecionando...')
+      setTimeout(() => {
+        router.push(getRedirectPath(role))
+      }, 600)
+    } catch (error) {
+      console.error('Erro no login:', error)
+      showToast('error', error instanceof Error ? error.message : 'Erro de conexão. Tente novamente.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <>
       <nav className="navbar-home">
@@ -11,6 +89,8 @@ export default function Home() {
           <li><Link href="#create-account">Cadastre-se</Link></li>
         </ul>
       </nav>
+
+      <Toast visible={toast.visible} type={toast.type} message={toast.message} onClose={closeToast} />
 
       <section className="hero">
         <div className="content">
@@ -67,12 +147,26 @@ export default function Home() {
 
           <div className="card">
             <h3>Já é cliente?</h3>
-            <p className="subtitle"></p>
-            <div className="button-group">
-              <input type="email" placeholder="Email" />
-              <input type="password" placeholder="Senha" />
-              <button className="login-btn">Entrar</button>
-            </div>
+            <p className="subtitle">Faça login com seu email e senha.</p>
+            <form className="button-group" onSubmit={handleLogin}>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button type="submit" className="login-btn" disabled={isSubmitting}>
+                {isSubmitting ? 'Entrando...' : 'Entrar'}
+              </button>
+            </form>
           </div>
         </div>
       </section>

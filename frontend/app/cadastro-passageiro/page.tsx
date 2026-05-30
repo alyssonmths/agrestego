@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Toast from "../components/Toast";
 import "./cadastro-passageiro.css";
 import { FormData, FormErrors } from "./interfaces/form";
 
@@ -19,7 +20,16 @@ export default function CadastroPassageiro() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [apiError, setApiError] = useState<string>("");
+
+  const [toast, setToast] = useState<{ visible: boolean; type: 'success' | 'error'; message: string }>({
+    visible: false,
+    type: 'success',
+    message: '',
+  });
+
+  function showToast(type: 'success' | 'error', message: string) {
+    setToast({ visible: true, type, message });
+  }
 
   function handleChange(field: keyof FormData, value: string) {
     let formattedValue = value;
@@ -59,14 +69,13 @@ export default function CadastroPassageiro() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setApiError("");
 
     if (!validate()) return;
 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_URL}/passageiro`, {
+      const response = await fetch(`${API_URL}/auth/signup-passageiro`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +91,8 @@ export default function CadastroPassageiro() {
       const data = await response.json();
 
       if (!response.ok) {
-        setApiError(data.message || "Erro ao criar conta. Tente novamente.");
+        const msg = data.message || "Erro ao criar conta. Tente novamente.";
+        showToast('error', msg);
         setIsSubmitting(false);
         return;
       }
@@ -90,11 +100,13 @@ export default function CadastroPassageiro() {
       // Salvar token no localStorage
       localStorage.setItem("access_token", data.access_token);
 
-      // Redirecionar para a home do passageiro
-      router.push("/home-passageiro");
+      // Mostrar toast de sucesso e redirecionar
+      showToast('success', 'Conta criada com sucesso!');
+      setTimeout(() => router.push("/home-passageiro"), 1200);
     } catch (error) {
       console.error("Erro:", error);
-      setApiError("Erro de conexão com o servidor. Tente novamente.");
+      const msg = "Erro de conexão com o servidor. Tente novamente.";
+      showToast('error', msg);
       setIsSubmitting(false);
     }
   }
@@ -137,13 +149,14 @@ export default function CadastroPassageiro() {
           <p>Em menos de um minuto você está pronto para a primeira corrida.</p>
         </div>
 
-        {apiError && (
-          <div className="error-text" style={{ padding: "10px", backgroundColor: "#fee", borderRadius: "4px", marginBottom: "20px" }}>
-            {apiError}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit}>
+
+          <Toast
+            visible={toast.visible}
+            type={toast.type}
+            message={toast.message}
+            onClose={() => setToast((s) => ({ ...s, visible: false }))}
+          />
 
           <div className="form-grid single-column">
             <div className="form-group">

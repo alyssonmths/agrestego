@@ -1,8 +1,9 @@
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PassageiroService } from 'src/passageiro/passageiro.service';
 import { JwtService } from '@nestjs/jwt';
 import { MotoristaService } from 'src/motorista/motorista.service';
+import { CreatePassageiroDto } from 'src/passageiro/dto/create-passageiro.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,34 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) { }
 
-    async signIn(email: string, pass: string): Promise<{ access_token: string }> {
+    async signUpPassageiro(createPassageiroDto: CreatePassageiroDto): Promise<{ passageiro: any, access_token: string }> {
+        // Validar email duplicado
+        const existingPassageiro = await this.passageiroService.findOne(createPassageiroDto.email);
+        if (existingPassageiro) {
+            throw new ConflictException('Email já cadastrado');
+        }
+
+        const existingMotorista = await this.motoristaService.findOne(createPassageiroDto.email);
+        if (existingMotorista) {
+            throw new ConflictException('Email já cadastrado');
+        }
+
+        // Criar passageiro
+        const passageiro = await this.passageiroService.create(createPassageiroDto);
+
+        // Gerar JWT
+        const payload = {
+            sub: passageiro.id,
+            email: passageiro.email,
+            role: 'passageiro',
+        };
+
+        const access_token = await this.jwtService.signAsync(payload);
+
+        return { passageiro, access_token };
+    }
+
+    async signIn(email: string, pass: string): Promise<{ access_token: string, role: 'passageiro' | 'motorista' }> {
         let role: 'passageiro' | 'motorista' = 'passageiro';
         let user = await this.passageiroService.findOne(email);
 
@@ -31,8 +59,11 @@ export class AuthService {
             role,
         };
 
+        const access_token = await this.jwtService.signAsync(payload);
+
         return {
-            access_token: await this.jwtService.signAsync(payload),
+            access_token,
+            role,
         };
     }
 }
