@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Put } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Put, Param} from '@nestjs/common';
 import { CorridaService } from './corrida.service';
 import { CreateCorridaDto } from './dto/create-corrida.dto';
 import { AvaliarCorridaPassageiroDto } from './dto/avaliar-corrida-passageiro.dto';
@@ -26,5 +26,11 @@ export class CorridaController {
   @Put('avaliar-motorista')
   avaliarMotorista(@Body() avaliarCorridaMotoristaDto: AvaliarCorridaMotoristaDto) {
     return this.corridaService.avaliarMotorista(avaliarCorridaMotoristaDto);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Put(":id/aceitar")
+  aceitar(@Param("id")id: number, @Req() req: any) {  
+    const motoristaId = req.user?.userId;
+    return this.corridaService.aceitarCorrida(Number(id), motoristaId);
   }
 }
