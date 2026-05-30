@@ -58,4 +58,13 @@ export class CorridaService {
       where: { id }
     });
   }
+  async finalizar(id: number) {
+    return this.prisma.corrida.update({
+        data: {
+            status: StatusCorrida.FINALIZADA,
+            fim: new Date()
+        },
+        where: { id }
+    });
+}
 }

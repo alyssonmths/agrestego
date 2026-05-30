@@ -33,4 +33,10 @@ export class CorridaController {
     const motoristaId = req.user?.userId;
     return this.corridaService.aceitarCorrida(Number(id), motoristaId);
   }
+  @UseGuards(JwtAuthGuard)
+@Put(":id/finalizar")
+finalizar(@Param("id") id: number) {
+    return this.corridaService.finalizar(Number(id));
+}
+
 }
