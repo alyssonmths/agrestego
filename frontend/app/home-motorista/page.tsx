@@ -2,9 +2,11 @@
 "use client"
 import "./home-motorista.css";
 import Link from "next/link";
+import AuthGuard from "../components/AuthGuard";
 
 export default function HomeMotorista(){
     return(
+      <AuthGuard>
          <div className="perfil-passageiro">
             <header className="header-perfil">
                 <div className="logo">
@@ -56,6 +58,6 @@ export default function HomeMotorista(){
                 
                  </section>
             </div>
-            
+      </AuthGuard>
         );
 }

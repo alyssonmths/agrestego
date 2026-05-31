@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import AuthGuard from '../components/AuthGuard'
 import './home-passageiro.css'
 import { RideRequest } from './interfaces/ride-request'
 
@@ -124,16 +125,17 @@ export default function HomePassageiro() {
   }
 
   return (
-    <div className="home-passageiro">
+    <AuthGuard>
+      <div className="home-passageiro">
       <header className="header-passageiro">
         <div className="logo-section">
           <img src="/logos/2-removebg-preview.png" alt="Logotipo AgresteGo" />
         </div>
 
         <nav className="nav-links">
-          <Link href="/" className="nav-link active">Início</Link>
+          <Link href="/home-passageiro" className="nav-link active">Início</Link>
           <Link href="/corridas" className="nav-link">Corridas</Link>
-          <Link href="/perfil" className="nav-link">Perfil</Link>
+          <Link href="/perfil-passageiro" className="nav-link">Perfil</Link>
         </nav>
       </header>
 
@@ -274,5 +276,6 @@ export default function HomePassageiro() {
         </div>
       </main>
     </div>
+    </AuthGuard>
   )
 }

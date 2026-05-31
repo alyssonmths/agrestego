@@ -1,9 +1,10 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Toast from './components/Toast'
+import { consumeAuthRedirectMessage } from './lib/auth'
 import './home.css'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
@@ -24,6 +25,13 @@ export default function Home() {
   }
 
   const closeToast = () => setToast((prev) => ({ ...prev, visible: false }))
+
+  useEffect(() => {
+    const authMessage = consumeAuthRedirectMessage()
+    if (authMessage) {
+      setToast({ visible: true, type: 'error', message: authMessage })
+    }
+  }, [])
 
   const getRedirectPath = (role: string) => {
     return role === 'motorista' ? '/home-motorista' : '/home-passageiro'
