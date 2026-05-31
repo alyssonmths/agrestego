@@ -7,13 +7,20 @@ import { PrismaService } from "src/database/prisma.service";
 export class MotoristaService {
   constructor(private readonly prisma: PrismaService) { }
 
-  create(createMotoristaDto: CreateMotoristaDto) {
-    return this.prisma.motorista.create({
+ async create(createMotoristaDto: CreateMotoristaDto) {
+    return await this.prisma.motorista.create({
       data: createMotoristaDto,
     });
   }
 
-  findOne(email: string) {
-    return this.prisma.motorista.findUnique({ where: { email } });
+  async findOne(email: string) {
+    return await this.prisma.motorista.findUnique({ where: { email } });
+  }
+
+  async update( id: number, request: UpdateMotoristaDto) {
+    return await this.prisma.motorista.update({
+      data: request,
+      where: { id } 
+    })
   }
 }
