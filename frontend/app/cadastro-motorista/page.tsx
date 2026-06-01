@@ -111,7 +111,7 @@ export default function CadastroMotorista() {
 
         try {
             // TODO: Integrar com API do backend
-            const response = await fetch('/auth/signup-motorista', {
+            const response = await fetch(`${API_URL}/auth/signup-motorista`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -283,7 +283,7 @@ export default function CadastroMotorista() {
                             {errors.senha && <div className="error-text">{errors.senha}</div>}
                         </div>
                     </div>
-                    
+
                     <button
                         type="submit"
                         className="submit-btn"
