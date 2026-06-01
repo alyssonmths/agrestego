@@ -4,6 +4,7 @@ import { PassageiroService } from 'src/passageiro/passageiro.service';
 import { JwtService } from '@nestjs/jwt';
 import { MotoristaService } from 'src/motorista/motorista.service';
 import { CreatePassageiroDto } from 'src/passageiro/dto/create-passageiro.dto';
+import { CreateMotoristaDto } from 'src/motorista/dto/create-motorista.dto';
 
 @Injectable()
 export class AuthService {
@@ -40,6 +41,10 @@ export class AuthService {
         return { passageiro, access_token };
     }
 
+    async signUpMotorista(createMotoristaDto: CreateMotoristaDto) {
+        return await this.motoristaService.create(createMotoristaDto);
+    }
+
     async signIn(email: string, pass: string): Promise<{ access_token: string, role: 'passageiro' | 'motorista' }> {
         let role: 'passageiro' | 'motorista' = 'passageiro';
         let user = await this.passageiroService.findOne(email);
@@ -66,4 +71,6 @@ export class AuthService {
             role,
         };
     }
+
+
 }
