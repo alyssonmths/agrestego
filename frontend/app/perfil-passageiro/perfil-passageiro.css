@@ -136,6 +136,14 @@
     color: #1F1F1F;
     border:none;
 }
+.form-group input.error {
+    border: 1px solid #E05A3A;
+}
+.error-text {
+    color: #E05A3A;
+    font-size: 13px;
+    margin-top: 4px;
+}
 .btn-salvar{
     margin-top: 24px;
     width: 100%;

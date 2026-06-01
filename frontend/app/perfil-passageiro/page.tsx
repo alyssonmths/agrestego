@@ -1,43 +1,114 @@
 "use client";
 import Link from "next/link";
 import AuthGuard from "../components/AuthGuard";
+import Toast from "../components/Toast";
 import "./perfil-passageiro.css";
 import { useState, FormEvent } from "react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+type PerfilFormData = {
+    nome: string;
+    email: string;
+    celular: string;
+};
+
+type PerfilFormErrors = Partial<Record<keyof PerfilFormData, string>>;
+
 export default function PerfilPassageiro() {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<PerfilFormData>({
         nome: "",
         email: "",
         celular: "",
-    })
-    const [errors, setErrors] = useState<any>({});
+    });
+    const [errors, setErrors] = useState<PerfilFormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    function handleChange(field: string, value: string) {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+
+    const [toast, setToast] = useState<{ visible: boolean; type: 'success' | 'error'; message: string }>({
+        visible: false,
+        type: 'success',
+        message: '',
+    });
+
+    function formatCelular(value: string): string {
+        const cleaned = value.replace(/\D/g, '');
+        if (cleaned.length <= 2) return `(${cleaned}`;
+        if (cleaned.length <= 6) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
+        if (cleaned.length <= 10) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+        return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
+    }
+
+    function handleChange(field: keyof PerfilFormData, value: string) {
+        let formattedValue = value;
+        if (field === 'celular') {
+            formattedValue = formatCelular(value);
+        }
+
+        setFormData((prev) => ({ ...prev, [field]: formattedValue }));
+
         if (errors[field]) {
-            setErrors((prev: any) => ({ ...prev, [field]: "" }));
+            setErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+                return next;
+            });
         }
     }
 
     function validate() {
-        let newErrors: any = {};
+        let newErrors: PerfilFormErrors = {};
 
         if (!formData.nome) newErrors.nome = "Nome obrigatório";
-        if (!formData.email.includes("@")) newErrors.email = "Email inválido";
-        if (formData.celular.length < 10) newErrors.celular = "Celular inválido";
+        if (!(/\S+@\S+\.\S+/).test(formData.email)) newErrors.email = "Email inválido";
+        if (!(/^\(\d{2}\)\s\d{5}-\d{4}$/).test(formData.celular)) newErrors.celular = "Formato: (81) 90000-0000";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     }
 
-    function handleSubmit(e: FormEvent) {
+    function showToast(type: 'success' | 'error', message: string) {
+        setToast({ visible: true, type, message });
+    }
+
+    async function handleSubmit(e: FormEvent) {
         e.preventDefault();
         if (!validate()) return;
         setIsSubmitting(true);
-        setTimeout(() => {
-            alert("Alterações salvas!");
+
+        try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                throw new Error('Token de autenticação não encontrado. Faça login novamente.');
+            }
+
+            const response = await fetch(`${API_URL}/passageiro`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    nome: formData.nome,
+                    email: formData.email,
+                    celular: formData.celular,
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                const message = data.message || 'Erro ao salvar alterações. Tente novamente.';
+                showToast('error', message);
+                setIsSubmitting(false);
+                return;
+            }
+
+            showToast('success', 'Alterações salvas!');
+        } catch (error) {
+            console.error(error);
+            showToast('error', 'Erro ao atualizar perfil. Verifique sua conexão ou faça login novamente.');
+        } finally {
             setIsSubmitting(false);
-        }, 1000);
+        }
     }
 
     return (
@@ -75,8 +146,9 @@ export default function PerfilPassageiro() {
                                     maxLength={50}
                                     value={formData.nome}
                                     onChange={(e) => handleChange("nome", e.target.value)}
-                                ></input>
-                                {errors.email && <p className="error-text">{errors.email}</p>}
+                                    className={errors.nome ? 'error' : ''}
+                                />
+                                {errors.nome && <p className="error-text">{errors.nome}</p>}
                             </div>
                             <div className="form-group">
                                 <label>EMAIL</label>
@@ -85,27 +157,35 @@ export default function PerfilPassageiro() {
                                     maxLength={50}
                                     value={formData.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
-                                ></input>
+                                    className={errors.email ? 'error' : ''}
+                                />
                                 {errors.email && <p className="error-text">{errors.email}</p>}
                             </div>
 
                             <div className="form-group">
                                 <label>CELULAR</label>
                                 <input
-                                    placeholder="(81)99999-0000"
+                                    type="tel"
+                                    placeholder="(81) 90000-0000"
                                     maxLength={15}
+                                    value={formData.celular}
                                     onChange={(e) => handleChange("celular", e.target.value)}
-                                ></input>
+                                    className={errors.celular ? 'error' : ''}
+                                />
                                 {errors.celular && <p className="error-text">{errors.celular}</p>}
 
                             </div>
-                            <button className="btn-salvar">Salvar alterações</button>
+                            <button className="btn-salvar" disabled={isSubmitting}>
+                                {isSubmitting ? 'Salvando...' : 'Salvar alterações'}
+                            </button>
                         </form>
-
                     </article>
-
-                    {/*direita*/}
-
+                    <Toast
+                        visible={toast.visible}
+                        type={toast.type}
+                        message={toast.message}
+                        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+                    />
                     <article className="card">
                         <header className="card-header">
                             <div>
