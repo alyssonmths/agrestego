@@ -1,12 +1,17 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
-import Link from 'next/link'
-import './cadastro-motorista.css'
-import { FormData, FormErrors } from './interfaces/form'
+import { useState, FormEvent } from 'react';
+import Link from 'next/link';
+import './cadastro-motorista.css';
+import { FormData, FormErrors } from './interfaces/form';
+import { useRouter } from "next/navigation";
+import Toast from "../components/Toast";
 
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export default function CadastroMotorista() {
+    const router = useRouter();
     const [formData, setFormData] = useState<FormData>({
         nome: '',
         email: '',
@@ -18,8 +23,32 @@ export default function CadastroMotorista() {
     })
 
     const [errors, setErrors] = useState<FormErrors>({})
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    
+    const [toast, setToast] =useState<{visible:boolean, type: 'success'| 'error', message: string}>({
+        visible: false,
+        type: 'success',
+        message: '',
+    });
+    function showToast(type: 'success' | 'error', message: string) {
+    setToast({ visible: true, type, message });
+  }
+  function handleChange(field: keyof FormData, value: string) {
+      let formattedValue = value;
+      if (field === 'celular') {
+        formattedValue = formatCelular(value);
+      }
+      setFormData((prev) => ({ ...prev, [field]: formattedValue }));
+  
+      if (errors[field]) {
+        setErrors((prev: FormErrors) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
+      }
+    }
+  
 
     function validate(): boolean {
         const newErrors: FormErrors = {};
@@ -74,7 +103,7 @@ export default function CadastroMotorista() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setSubmitMessage(null);
+        
 
         if (!validate()) return;
 
@@ -82,51 +111,39 @@ export default function CadastroMotorista() {
 
         try {
             // TODO: Integrar com API do backend
-            const response = await fetch('/api/cadastro/motorista', {
+            const response = await fetch('/auth/signup-motorista', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ...formData,
-                    tipo: 'motorista'
+                    nome:formData.nome,
+                    email:formData.email,
+                    celular:formData.celular,
+                    cnh:formData.cnh,
+                    veiculo:formData.veiculo,
+                    placa:formData.placa,
+                    senha:formData.senha
                 }),
             })
 
-            if (response.ok) {
-                const data = await response.json()
-                setSubmitMessage({
-                    type: 'success',
-                    text: 'Conta criada com sucesso! Você será redirecionado em breve.'
-                })
+            const data = await response.json();
 
-                setFormData({
-                    nome: '',
-                    email: '',
-                    celular: '',
-                    cnh: '',
-                    veiculo: '',
-                    placa: '',
-                    senha: ''
-                })
-
-                // TODO: Redirecionar para dashboard ou página de confirmação
-                setTimeout(() => {
-                    window.location.href = '/dashboard-motorista'
-                }, 2000)
-
-            } else {
-                const errorData = await response.json()
-                throw new Error(errorData.message || 'Erro ao criar conta')
+            if (!response.ok) {
+                const msg = data.message || 'Erro ao criar conta. Tente novamente.';
+                showToast('error', msg);
+                setIsSubmitting(false);
+                return;
             }
+            localStorage.setItem("accessToken", data.accessToken);
+            
+            showToast('success', 'Conta criada com sucesso!');
+            setTimeout(() => router.push('/home-motorista'),1200);
 
         } catch (error) {
             console.error('Erro no cadastro:', error)
-            setSubmitMessage({
-                type: 'error',
-                text: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.'
-            })
-        } finally {
+            const msg= "Erro de conexão com o servidor. Tente novamente.";
+            showToast('error', msg);
             setIsSubmitting(false);
         }
     }
@@ -164,6 +181,12 @@ export default function CadastroMotorista() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                    <Toast
+                        visible={toast.visible}
+                        type={toast.type}
+                        message={toast.message}
+                        onClose={() => setToast(prev => ({ ...prev, visible: false }))}
+                    />  
                     <div className="form-grid single-column">
                         <div className="form-group">
                             <label>NOME COMPLETO</label>
@@ -260,20 +283,7 @@ export default function CadastroMotorista() {
                             {errors.senha && <div className="error-text">{errors.senha}</div>}
                         </div>
                     </div>
-
-                    {submitMessage && (
-                        <div style={{
-                            padding: '12px 16px',
-                            borderRadius: '8px',
-                            marginBottom: '20px',
-                            backgroundColor: submitMessage.type === 'success' ? '#d4edda' : '#f8d7da',
-                            color: submitMessage.type === 'success' ? '#155724' : '#721c24',
-                            border: `1px solid ${submitMessage.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
-                        }}>
-                            {submitMessage.text}
-                        </div>
-                    )}
-
+                    
                     <button
                         type="submit"
                         className="submit-btn"
