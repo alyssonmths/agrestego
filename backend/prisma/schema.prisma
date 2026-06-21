@@ -20,6 +20,8 @@ model Passageiro {
   senha    String
   celular  String
   corridas Corrida[]
+  imagemId Int? @unique
+  imagem   Imagem?   @relation(fields: [imagemId], references: [id])
 }
 
 model Motorista {
@@ -32,6 +34,8 @@ model Motorista {
   veiculo  String
   placa    String
   corridas Corrida[]
+  imagemId Int? @unique
+  imagem   Imagem?   @relation(fields: [imagemId], references: [id])
 }
 
 model Corrida {
@@ -72,4 +76,13 @@ model Avaliacao {
   notaMotorista  Int?
   corridaId      Int     @unique
   corrida        Corrida @relation(fields: [corridaId], references: [id])
+}
+
+model Imagem {
+  id          Int          @id @default(autoincrement())
+  nome        String
+  mimeType    String
+  arquivo     Bytes
+  passageiro Passageiro?
+  motorista  Motorista?
 }
