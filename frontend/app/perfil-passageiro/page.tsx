@@ -3,7 +3,7 @@ import Link from "next/link";
 import AuthGuard from "../components/AuthGuard";
 import Toast from "../components/Toast";
 import "./perfil-passageiro.css";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect, useRef } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -29,6 +29,11 @@ export default function PerfilPassageiro() {
         type: 'success',
         message: '',
     });
+
+    const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const prevObjectUrlRef = useRef<string | null>(null);
 
     function formatCelular(value: string): string {
         const cleaned = value.replace(/\D/g, '');
@@ -68,6 +73,83 @@ export default function PerfilPassageiro() {
 
     function showToast(type: 'success' | 'error', message: string) {
         setToast({ visible: true, type, message });
+    }
+
+    useEffect(() => {
+        async function fetchImage() {
+            try {
+                const token = localStorage.getItem('access_token');
+                if (!token) return;
+
+                const res = await fetch(`${API_URL}/passageiro/image`, {
+                    method: 'GET',
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!res.ok) return;
+
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                prevObjectUrlRef.current && URL.revokeObjectURL(prevObjectUrlRef.current);
+                prevObjectUrlRef.current = url;
+                setProfileImageUrl(url);
+            } catch (err) {
+                // silently ignore
+            }
+        }
+
+        fetchImage();
+
+        return () => {
+            if (prevObjectUrlRef.current) {
+                URL.revokeObjectURL(prevObjectUrlRef.current);
+            }
+        };
+    }, []);
+
+    async function handleFileChange(e: any) {
+        const file = e.target?.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const token = localStorage.getItem('access_token');
+            if (!token) throw new Error('Token de autenticação não encontrado');
+
+            const formData = new FormData();
+            formData.append('arquivo', file);
+
+            const res = await fetch(`${API_URL}/passageiro/image`, {
+                method: 'PUT',
+                headers: { Authorization: `Bearer ${token}` },
+                body: formData,
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                const message = data?.message || 'Erro ao enviar imagem';
+                showToast('error', message);
+                return;
+            }
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            prevObjectUrlRef.current && URL.revokeObjectURL(prevObjectUrlRef.current);
+            prevObjectUrlRef.current = url;
+            setProfileImageUrl(url);
+            showToast('success', 'Imagem atualizada com sucesso');
+        } catch (err) {
+            console.error(err);
+            showToast('error', 'Erro ao atualizar imagem');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    }
+
+    function handleAvatarClick() {
+        if (isUploading) return;
+        fileInputRef.current?.click();
     }
 
     async function handleSubmit(e: FormEvent) {
@@ -121,7 +203,7 @@ export default function PerfilPassageiro() {
                     <nav className="links">
                         <Link href={"/home-passageiro"}>Início</Link>
                         <Link href={"corridas"}>Corridas</Link>
-                        <Link href={"perfil"}>Perfil</Link>
+                        <Link href={"/perfil-passageiro"}>Perfil</Link>
                     </nav>
                 </header>
                 <div className="titulo-perfil">
@@ -132,7 +214,29 @@ export default function PerfilPassageiro() {
                 <section className="cards-container">
                     <article className="card">
                         <header className="card-header">
-                            <div className="avatar">M</div>
+                            <div className="avatar-container">
+                                <div className="avatar" onClick={handleAvatarClick} role="button" tabIndex={0}>
+                                    {profileImageUrl ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={profileImageUrl} alt="Avatar" />
+                                    ) : (
+                                        <span>M</span>
+                                    )}
+
+                                    <div className={`avatar-overlay ${isUploading ? 'uploading' : ''}`}>
+                                        {isUploading ? (
+                                            <div className="spinner" aria-hidden="true"></div>
+                                        ) : (
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 3v10" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M7 8l5-5 5 5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M21 21H3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        )}
+                                    </div>
+                                </div>
+                                <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+                            </div>
                             <div>
                                 <h2>Informações da conta</h2>
                                 <p>Mantenha seus dados em dia.</p>
