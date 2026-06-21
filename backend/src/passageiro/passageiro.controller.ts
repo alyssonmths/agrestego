@@ -14,13 +14,6 @@ export class PassageiroController {
     private readonly passageiroService: PassageiroService,
   ) { }
 
-  @Post()
-  @ApiOperation({ summary: 'Criar conta de passageiro' })
-  @ApiResponse({ status: 201, description: 'Passageiro criado' })
-  async create(@Body() createPassageiroDto: CreatePassageiroDto) {
-    return await this.passageiroService.create(createPassageiroDto);
-  }
-
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Atualizar dados do passageiro autenticado' })
