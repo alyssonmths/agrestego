@@ -76,11 +76,28 @@ export default function PerfilPassageiro() {
     }
 
     useEffect(() => {
-        async function fetchImage() {
+        async function fetchProfileAndImage() {
             try {
                 const token = localStorage.getItem('access_token');
                 if (!token) return;
 
+                // Fetch profile data
+                const profileRes = await fetch(`${API_URL}/passageiro`, {
+                    method: 'GET',
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (profileRes.ok) {
+                    const profileData = await profileRes.json().catch(() => ({}));
+                    setFormData((prev) => ({
+                        ...prev,
+                        nome: profileData.nome || '',
+                        email: profileData.email || '',
+                        celular: formatCelular(profileData.celular || ''),
+                    }));
+                }
+
+                // Fetch profile image
                 const res = await fetch(`${API_URL}/passageiro/image`, {
                     method: 'GET',
                     headers: { Authorization: `Bearer ${token}` },
@@ -98,7 +115,7 @@ export default function PerfilPassageiro() {
             }
         }
 
-        fetchImage();
+        fetchProfileAndImage();
 
         return () => {
             if (prevObjectUrlRef.current) {

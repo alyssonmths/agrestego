@@ -43,6 +43,23 @@ export class PassageiroController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obter dados do passageiro autenticado' })
+  @ApiResponse({ status: 200, description: 'Dados do passageiro' })
+  @Get()
+  async getProfile(@Req() req: any) {
+    const userId = req.user?.userId;
+    const passageiro = await this.passageiroService.findById(userId);
+
+    if (!passageiro) {
+      throw new NotFoundException('Passageiro não encontrado');
+    }
+
+    const { id, nome, email, celular } = passageiro;
+    return { id, nome, email, celular };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Atualiza a imagem de perfil de um passageiro' })
   @ApiResponse({ status: 200, description: 'Imagem de perfil atualizada' })
   @ApiConsumes('multipart/form-data')

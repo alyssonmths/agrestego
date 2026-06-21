@@ -18,6 +18,9 @@ export class PassageiroService {
     return await this.prisma.passageiro.findUnique({ where: { email } });
   }
 
+  async findById(id: number): Promise<any> {
+    return await this.prisma.passageiro.findUnique({ where: { id } });
+  }
   async update(id: number, request: UpdatePassageiroDto) {
     return await this.prisma.passageiro.update({
       data: request,
