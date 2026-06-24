@@ -20,7 +20,7 @@ model Passageiro {
   senha    String
   celular  String
   corridas Corrida[]
-  imagemId Int? @unique
+  imagemId Int?      @unique
   imagem   Imagem?   @relation(fields: [imagemId], references: [id])
 }
 
@@ -34,7 +34,7 @@ model Motorista {
   veiculo  String
   placa    String
   corridas Corrida[]
-  imagemId Int? @unique
+  imagemId Int?      @unique
   imagem   Imagem?   @relation(fields: [imagemId], references: [id])
 }
 
@@ -53,6 +53,7 @@ model Corrida {
   passageiro   Passageiro    @relation(fields: [passageiroId], references: [id])
   motorista    Motorista?    @relation(fields: [motoristaId], references: [id])
   avaliacao    Avaliacao?
+  pagamento    Pagamento?
 }
 
 enum StatusCorrida {
@@ -79,10 +80,32 @@ model Avaliacao {
 }
 
 model Imagem {
-  id          Int          @id @default(autoincrement())
-  nome        String
-  mimeType    String
-  arquivo     Bytes
+  id         Int         @id @default(autoincrement())
+  nome       String
+  mimeType   String
+  arquivo    Bytes
   passageiro Passageiro?
   motorista  Motorista?
+}
+
+enum MetodoPagamento {
+  CARTAO
+  PIX
+  DINHEIRO
+}
+
+enum StatusPagamento {
+  PENDENTE
+  PAGO
+  FALHOU
+  REEMBOLSADO
+}
+
+model Pagamento {
+  id        Int             @id @default(autoincrement())
+  corridaId Int             @unique
+  metodo    MetodoPagamento?
+  status    StatusPagamento
+  valor     Float
+  corrida   Corrida         @relation(fields: [corridaId], references: [id])
 }

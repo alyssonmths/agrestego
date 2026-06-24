@@ -5,6 +5,7 @@ import { AvaliarCorridaPassageiroDto } from './dto/avaliar-corrida-passageiro.dt
 import { AvaliarCorridaMotoristaDto } from './dto/avaliar-corrida-motorista.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { PagarCorridaDto } from './dto/pagar-corrida.dto';
 
 @Controller('corrida')
 @ApiTags('Corrida')
@@ -54,6 +55,15 @@ export class CorridaController {
   @Put(":id/finalizar")
   finalizar(@Param("id") id: number) {
     return this.corridaService.finalizar(Number(id));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Pagar corrida' })
+  @ApiResponse({ status: 200, description: 'Pagamento registrado' })
+  @Post(":id/pagar")
+  pagar(@Param("id") id: number, @Body() pagarCorridaDto: PagarCorridaDto) {
+    return this.corridaService.pagar(Number(id), pagarCorridaDto);
   }
 
 }
