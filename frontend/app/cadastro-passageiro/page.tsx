@@ -215,7 +215,7 @@ export default function CadastroPassageiro() {
             {isSubmitting ? "Criando..." : "Criar minha conta"}
           </button>
 
-          <p className="login-link">Já tem conta? <Link href="/login">Entrar</Link>
+          <p className="login-link">Já tem conta? <Link href="/">Entrar</Link>
           </p>
 
         </form>

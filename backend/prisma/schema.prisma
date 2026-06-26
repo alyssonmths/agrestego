@@ -14,14 +14,31 @@ datasource db {
 }
 
 model Passageiro {
-  id       Int       @id @default(autoincrement())
-  nome     String
-  email    String    @unique
-  senha    String
-  celular  String
-  corridas Corrida[]
-  imagemId Int?      @unique
-  imagem   Imagem?   @relation(fields: [imagemId], references: [id])
+  id        Int       @id @default(autoincrement())
+  nome      String
+  email     String    @unique
+  senha     String
+  celular   String
+  corridas  Corrida[]
+  enderecos Endereco[]
+  imagemId  Int?      @unique
+  imagem    Imagem?   @relation(fields: [imagemId], references: [id])
+}
+
+model Endereco {
+  id           Int       @id @default(autoincrement())
+  passageiroId Int
+  apelido      String
+  logradouro   String
+  numero       String
+  bairro       String
+  cidade       String
+  estado       String
+  cep          String
+  complemento  String?
+  criadoEm     DateTime  @default(now())
+
+  passageiro   Passageiro @relation(fields: [passageiroId], references: [id])
 }
 
 model Motorista {

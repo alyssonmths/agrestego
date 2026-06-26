@@ -15,6 +15,32 @@ type PerfilFormData = {
 
 type PerfilFormErrors = Partial<Record<keyof PerfilFormData, string>>;
 
+type EnderecoFormData = {
+    apelido: string;
+    logradouro: string;
+    numero: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    cep: string;
+    complemento: string;
+};
+
+type EnderecoFormErrors = Partial<Record<keyof EnderecoFormData, string>>;
+
+type Endereco = {
+    id: number;
+    apelido: string;
+    logradouro: string;
+    numero: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    cep: string;
+    complemento?: string;
+    criadoEm?: string;
+};
+
 export default function PerfilPassageiro() {
     const [formData, setFormData] = useState<PerfilFormData>({
         nome: "",
@@ -23,6 +49,20 @@ export default function PerfilPassageiro() {
     });
     const [errors, setErrors] = useState<PerfilFormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [enderecoForm, setEnderecoForm] = useState<EnderecoFormData>({
+        apelido: "",
+        logradouro: "",
+        numero: "",
+        bairro: "",
+        cidade: "",
+        estado: "",
+        cep: "",
+        complemento: "",
+    });
+    const [enderecoErrors, setEnderecoErrors] = useState<EnderecoFormErrors>({});
+    const [isSavingEndereco, setIsSavingEndereco] = useState(false);
+    const [enderecos, setEnderecos] = useState<Endereco[]>([]);
 
     const [toast, setToast] = useState<{ visible: boolean; type: 'success' | 'error'; message: string }>({
         visible: false,
@@ -60,6 +100,18 @@ export default function PerfilPassageiro() {
         }
     }
 
+    function handleEnderecoChange(field: keyof EnderecoFormData, value: string) {
+        setEnderecoForm((prev) => ({ ...prev, [field]: value }));
+
+        if (enderecoErrors[field]) {
+            setEnderecoErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+                return next;
+            });
+        }
+    }
+
     function validate() {
         let newErrors: PerfilFormErrors = {};
 
@@ -68,6 +120,21 @@ export default function PerfilPassageiro() {
         if (!(/^\(\d{2}\)\s\d{5}-\d{4}$/).test(formData.celular)) newErrors.celular = "Formato: (81) 90000-0000";
 
         setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
+
+    function validateEndereco() {
+        let newErrors: EnderecoFormErrors = {};
+
+        if (!enderecoForm.apelido) newErrors.apelido = 'Apelido obrigatório';
+        if (!enderecoForm.logradouro) newErrors.logradouro = 'Logradouro obrigatório';
+        if (!enderecoForm.numero) newErrors.numero = 'Número obrigatório';
+        if (!enderecoForm.bairro) newErrors.bairro = 'Bairro obrigatório';
+        if (!enderecoForm.cidade) newErrors.cidade = 'Cidade obrigatória';
+        if (!enderecoForm.estado) newErrors.estado = 'Estado obrigatório';
+        if (!enderecoForm.cep) newErrors.cep = 'CEP obrigatório';
+
+        setEnderecoErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     }
 
@@ -95,6 +162,20 @@ export default function PerfilPassageiro() {
                         email: profileData.email || '',
                         celular: formatCelular(profileData.celular || ''),
                     }));
+                }
+
+                // Fetch saved addresses
+                try {
+                    const addrRes = await fetch(`${API_URL}/passageiro/enderecos`, {
+                        method: 'GET',
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    if (addrRes.ok) {
+                        const list = await addrRes.json().catch(() => []);
+                        setEnderecos(list || []);
+                    }
+                } catch (e) {
+                    // ignore
                 }
 
                 // Fetch profile image
@@ -210,6 +291,78 @@ export default function PerfilPassageiro() {
         }
     }
 
+    async function handleSaveEndereco(e: FormEvent) {
+        e.preventDefault();
+        if (!validateEndereco()) return;
+        setIsSavingEndereco(true);
+
+        try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                throw new Error('Token de autenticação não encontrado. Faça login novamente.');
+            }
+
+            const response = await fetch(`${API_URL}/passageiro/enderecos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(enderecoForm),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                const message = data.message || 'Erro ao salvar o endereço. Tente novamente.';
+                showToast('error', message);
+                setIsSavingEndereco(false);
+                return;
+            }
+
+            setEnderecoForm({
+                apelido: '',
+                logradouro: '',
+                numero: '',
+                bairro: '',
+                cidade: '',
+                estado: '',
+                cep: '',
+                complemento: '',
+            });
+            setEnderecoErrors({});
+            showToast('success', 'Endereço salvo com sucesso!');
+        } catch (error) {
+            console.error(error);
+            showToast('error', 'Erro ao salvar endereço. Verifique sua conexão ou faça login novamente.');
+        } finally {
+            setIsSavingEndereco(false);
+        }
+    }
+
+    async function handleDeleteEndereco(id: number) {
+        if (!confirm('Confirma exclusão deste endereço?')) return;
+        try {
+            const token = localStorage.getItem('access_token');
+            if (!token) throw new Error('Token não encontrado');
+
+            const res = await fetch(`${API_URL}/passageiro/enderecos/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!res.ok) {
+                showToast('error', 'Não foi possível excluir o endereço');
+                return;
+            }
+
+            setEnderecos((prev) => prev.filter((e) => e.id !== id));
+            showToast('success', 'Endereço excluído');
+        } catch (err) {
+            console.error(err);
+            showToast('error', 'Erro ao excluir endereço');
+        }
+    }
+
     return (
         <AuthGuard>
             <div className="perfil-passageiro">
@@ -313,47 +466,107 @@ export default function PerfilPassageiro() {
                                 <h2>Endereços salvos</h2>
                                 <p>Acesse rapidamente nas próximas corridas.</p>
                             </div>
-                            <span className="badge-numero">2</span>
+                            <span className="badge-numero">{enderecos.length}</span>
                         </header>
-
-                        <div className="endereco-item ">
-                            <span className="icone">🏠</span>
-                            <div>
-                                <strong>Casa</strong>
-                                <span>Rua das Acácias, 123 — Caruaru/PE</span>
+                        {enderecos.map((endereco) => (
+                            <div key={endereco.id} className="endereco-item">
+                                <span className="icone">🏠</span>
+                                <div>
+                                    <strong>{endereco.apelido}</strong>
+                                    <span>{`${endereco.logradouro}, ${endereco.numero} — ${endereco.cidade}/${endereco.estado}`}</span>
+                                </div>
+                                <div className="endereco-acoes">
+                                    <button onClick={() => handleDeleteEndereco(endereco.id)}>🗑️</button>
+                                </div>
                             </div>
-                            <div className="endereco-acoes">
-                                <button>✏️</button>
-                                <button>🗑️</button>
-                            </div>
-                        </div>
-
-                        <div className="endereco-item">
-                            <span className="icone-endereco">💼</span>
-                            <div>
-                                <strong>Trabalho</strong>
-                                <span>Polo de Confecções, Loja 42 — Caruaru/PE</span>
-                            </div>
-                            <div className="endereco-acoes">
-                                <button>✏️</button>
-                                <button>🗑️</button>
-                            </div>
-                        </div>
+                        ))}
 
                         <div className="adicionar-box">
-                            <p className="adicionar-titulo  ">+ Adicionar endereços</p>
+                            <p className="adicionar-titulo">+ Adicionar endereços</p>
 
-                            <div className="form-group">
-                                <label>RÓTULO</label>
-                                <input
-                                    placeholder="Casa da vovó"></input>
-                            </div>
-                            <div className="form-group">
-                                <label>ENDEREÇO COMPLETO</label>
-                                <input
-                                    placeholder="Rua, número, bairro, cidade"></input>
-                            </div>
-                            <button className="btn-adicionar">Adicionar</button>
+                            <form onSubmit={handleSaveEndereco}>
+                                <div className="form-group">
+                                    <label>RÓTULO</label>
+                                    <input
+                                        value={enderecoForm.apelido}
+                                        onChange={(e) => handleEnderecoChange('apelido', e.target.value)}
+                                        placeholder="Casa da vovó"
+                                        className={enderecoErrors.apelido ? 'error' : ''}
+                                    />
+                                    {enderecoErrors.apelido && <p className="error-text">{enderecoErrors.apelido}</p>}
+                                </div>
+                                <div className="form-group">
+                                    <label>LOGRADOURO</label>
+                                    <input
+                                        value={enderecoForm.logradouro}
+                                        onChange={(e) => handleEnderecoChange('logradouro', e.target.value)}
+                                        placeholder="Rua das Flores"
+                                        className={enderecoErrors.logradouro ? 'error' : ''}
+                                    />
+                                    {enderecoErrors.logradouro && <p className="error-text">{enderecoErrors.logradouro}</p>}
+                                </div>
+                                <div className="form-group">
+                                    <label>NÚMERO</label>
+                                    <input
+                                        value={enderecoForm.numero}
+                                        onChange={(e) => handleEnderecoChange('numero', e.target.value)}
+                                        placeholder="123"
+                                        className={enderecoErrors.numero ? 'error' : ''}
+                                    />
+                                    {enderecoErrors.numero && <p className="error-text">{enderecoErrors.numero}</p>}
+                                </div>
+                                <div className="form-group">
+                                    <label>BAIRRO</label>
+                                    <input
+                                        value={enderecoForm.bairro}
+                                        onChange={(e) => handleEnderecoChange('bairro', e.target.value)}
+                                        placeholder="Centro"
+                                        className={enderecoErrors.bairro ? 'error' : ''}
+                                    />
+                                    {enderecoErrors.bairro && <p className="error-text">{enderecoErrors.bairro}</p>}
+                                </div>
+                                <div className="form-group">
+                                    <label>CIDADE</label>
+                                    <input
+                                        value={enderecoForm.cidade}
+                                        onChange={(e) => handleEnderecoChange('cidade', e.target.value)}
+                                        placeholder="Caruaru"
+                                        className={enderecoErrors.cidade ? 'error' : ''}
+                                    />
+                                    {enderecoErrors.cidade && <p className="error-text">{enderecoErrors.cidade}</p>}
+                                </div>
+                                <div className="form-group">
+                                    <label>ESTADO</label>
+                                    <input
+                                        value={enderecoForm.estado}
+                                        onChange={(e) => handleEnderecoChange('estado', e.target.value)}
+                                        placeholder="PE"
+                                        className={enderecoErrors.estado ? 'error' : ''}
+                                    />
+                                    {enderecoErrors.estado && <p className="error-text">{enderecoErrors.estado}</p>}
+                                </div>
+                                <div className="form-group">
+                                    <label>CEP</label>
+                                    <input
+                                        value={enderecoForm.cep}
+                                        onChange={(e) => handleEnderecoChange('cep', e.target.value)}
+                                        placeholder="55000-000"
+                                        className={enderecoErrors.cep ? 'error' : ''}
+                                    />
+                                    {enderecoErrors.cep && <p className="error-text">{enderecoErrors.cep}</p>}
+                                </div>
+                                <div className="form-group">
+                                    <label>COMPLEMENTO (opcional)</label>
+                                    <input
+                                        value={enderecoForm.complemento}
+                                        onChange={(e) => handleEnderecoChange('complemento', e.target.value)}
+                                        placeholder="Apto 101"
+                                    />
+                                </div>
+                                <button className="btn-adicionar" disabled={isSavingEndereco}>
+                                    {isSavingEndereco ? 'Salvando...' : 'Adicionar'}
+                                </button>
+                            </form>
                         </div>
                     </article>
                 </section>

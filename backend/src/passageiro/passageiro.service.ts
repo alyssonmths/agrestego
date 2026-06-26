@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreatePassageiroDto } from './dto/create-passageiro.dto';
+import { CreateEnderecoDto } from './dto/create-endereco.dto';
 import { PrismaService } from 'src/database/prisma.service';
 import { UpdatePassageiroDto } from './dto/update-passageiro.dto';
 
@@ -12,6 +13,33 @@ export class PassageiroService {
     return await this.prisma.passageiro.create({
       data: request,
     });
+  }
+
+  async createEndereco(userId: number, request: CreateEnderecoDto) {
+    return await this.prisma.endereco.create({
+      data: {
+        ...request,
+        passageiro: {
+          connect: { id: userId },
+        },
+      },
+    });
+  }
+
+  async listEnderecos(userId: number) {
+    return await this.prisma.endereco.findMany({
+      where: { passageiroId: userId },
+      orderBy: { criadoEm: 'desc' },
+    });
+  }
+
+  async deleteEndereco(userId: number, enderecoId: number) {
+    const endereco = await this.prisma.endereco.findUnique({ where: { id: enderecoId } });
+    if (!endereco || endereco.passageiroId !== userId) {
+      throw new Error('Endereço não encontrado ou sem permissão');
+    }
+
+    return await this.prisma.endereco.delete({ where: { id: enderecoId } });
   }
 
   async findOne(email: string): Promise<any> {

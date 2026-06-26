@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Put, Req, UseGuards, UploadedFile, Res, NotFoundException, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Req, UseGuards, UploadedFile, Res, NotFoundException, UseInterceptors, BadRequestException, Delete, Param } from '@nestjs/common';
 import { PassageiroService } from './passageiro.service';
 import { CreatePassageiroDto } from './dto/create-passageiro.dto';
+import { CreateEnderecoDto } from './dto/create-endereco.dto';
 import type { Response } from 'express';
 import { UpdatePassageiroDto } from './dto/update-passageiro.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -56,6 +57,40 @@ export class PassageiroController {
 
     const { id, nome, email, celular } = passageiro;
     return { id, nome, email, celular };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Adicionar um endereço salvo do passageiro autenticado' })
+  @ApiResponse({ status: 201, description: 'Endereço criado com sucesso' })
+  @Post('enderecos')
+  async createEndereco(@Req() req: any, @Body() createEnderecoDto: CreateEnderecoDto) {
+    const userId = req.user?.userId;
+    return this.passageiroService.createEndereco(userId, createEnderecoDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Listar endereços do passageiro autenticado' })
+  @ApiResponse({ status: 200, description: 'Lista de endereços' })
+  @Get('enderecos')
+  async listEnderecos(@Req() req: any) {
+    const userId = req.user?.userId;
+    return this.passageiroService.listEnderecos(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Excluir um endereço do passageiro autenticado' })
+  @ApiResponse({ status: 200, description: 'Endereço excluído' })
+  @Delete('enderecos/:id')
+  async deleteEndereco(@Req() req: any, @Param('id') id: string) {
+    const userId = req.user?.userId;
+    try {
+      return await this.passageiroService.deleteEndereco(userId, Number(id));
+    } catch (err: any) {
+      throw new NotFoundException(err.message || 'Não foi possível excluir o endereço');
+    }
   }
 
   @UseGuards(JwtAuthGuard)
