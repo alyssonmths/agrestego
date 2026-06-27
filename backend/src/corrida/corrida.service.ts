@@ -32,6 +32,32 @@ export class CorridaService {
     return corrida;
   }
 
+  async findOne(id: number) {
+    const corrida = await this.prisma.corrida.findUnique({
+      where: { id: Number(id) },
+      include: {
+        origem: true,
+        destino: true,
+        motorista: {
+          select: {
+            id: true,
+            nome: true,
+            placa: true,
+            veiculo: true,
+          }
+        },
+        pagamento: true,
+        avaliacao: true,
+      },
+    });
+
+    if (!corrida) {
+      throw new NotFoundException('Corrida não encontrada');
+    }
+
+    return corrida;
+  }
+
   async avaliarPassageiro(request: AvaliarCorridaPassageiroDto) {
     await this.prisma.avaliacao.update({
       data: {
