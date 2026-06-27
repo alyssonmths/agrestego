@@ -24,6 +24,16 @@ export class CorridaController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Listar corridas finalizadas do passageiro' })
+  @ApiResponse({ status: 200, description: 'Lista de corridas finalizadas do passageiro' })
+  @Get('minhas-finalizadas')
+  listarFinalizadas(@Req() req: any) {
+    const passageiroId = req.user?.userId;
+    return this.corridaService.listarFinalizadasPorPassageiro(Number(passageiroId));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obter corrida por ID' })
   @ApiResponse({ status: 200, description: 'Corrida encontrada' })
   @Get(':id')
@@ -74,7 +84,6 @@ export class CorridaController {
   Listar(){
     return this.corridaService.listar();
   }
-
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

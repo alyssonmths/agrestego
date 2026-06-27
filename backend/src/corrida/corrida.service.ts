@@ -129,4 +129,28 @@ export class CorridaService {
       where: {status:StatusCorrida.SOLICITADA}
     });
   }
+
+  async listarFinalizadasPorPassageiro(passageiroId: number) {
+    return await this.prisma.corrida.findMany({
+      where: {
+        passageiroId,
+        status: StatusCorrida.FINALIZADA,
+      },
+      orderBy: {
+        fim: 'desc',
+      },
+      include: {
+        origem: true,
+        destino: true,
+        motorista: {
+          select: {
+            id: true,
+            nome: true,
+            placa: true,
+            veiculo: true,
+          },
+        },
+      },
+    });
+  }
 }
