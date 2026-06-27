@@ -1,20 +1,30 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import AuthGuard from '../components/AuthGuard'
 import './home-passageiro.css'
 import { RideRequest } from './interfaces/ride-request'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+
+type Bairro = {
+  id: number
+  nome: string
+}
+
 export default function HomePassageiro() {
   const [rideRequest, setRideRequest] = useState<RideRequest>({
-    origem: '',
-    destino: '',
-    passageiros: 1
+    origemId: '',
+    destinoId: ''
   });
-
+  const [bairros, setBairros] = useState<Bairro[]>([]);
+  const [isLoadingBairros, setIsLoadingBairros] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const router = useRouter();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -23,38 +33,58 @@ export default function HomePassageiro() {
     return 'BOA NOITE';
   }
 
-  const quickDestinations = [
-    { name: 'Caruaru', icon: '📍' },
-    { name: 'Garanhuns', icon: '📍' },
-    { name: 'Bezerros', icon: '📍' }
-  ]
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setIsLoadingBairros(false);
+      return;
+    }
 
-  const handleInputChange = (field: keyof RideRequest, value: string | number) => {
+    const loadBairros = async () => {
+      try {
+        const response = await fetch(`${API_URL}/bairro`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Não foi possível carregar os bairros.');
+        }
+
+        const data = await response.json();
+        setBairros(data);
+      } catch (error) {
+        console.error(error);
+        setSubmitMessage({
+          type: 'error',
+          text: error instanceof Error ? error.message : 'Erro ao carregar bairros.',
+        });
+      } finally {
+        setIsLoadingBairros(false);
+      }
+    };
+
+    loadBairros();
+  }, []);
+
+  const handleInputChange = (field: keyof RideRequest, value: number | '') => {
     setRideRequest(prev => ({ ...prev, [field]: value }));
     setSubmitMessage(null); // Limpar mensagens de erro ao digitar
   }
 
-  const handlePassengerChange = (increment: boolean) => {
-    setRideRequest(prev => ({
-      ...prev,
-      passageiros: increment
-        ? Math.min(prev.passageiros + 1, 4) // Máximo 4 passageiros
-        : Math.max(prev.passageiros - 1, 1) // Mínimo 1 passageiro
-    }));
-  }
-
   const validateForm = (): boolean => {
-    if (!rideRequest.origem.trim()) {
+    if (rideRequest.origemId === '') {
       setSubmitMessage({ type: 'error', text: 'Por favor, informe a origem da viagem.' });
       return false;
     }
 
-    if (!rideRequest.destino.trim()) {
+    if (rideRequest.destinoId === '') {
       setSubmitMessage({ type: 'error', text: 'Por favor, informe o destino da viagem.' });
       return false;
     }
 
-    if (rideRequest.origem.trim().toLowerCase() === rideRequest.destino.trim().toLowerCase()) {
+    if (rideRequest.origemId === rideRequest.destinoId) {
       setSubmitMessage({ type: 'error', text: 'Origem e destino não podem ser iguais.' });
       return false;
     }
@@ -70,58 +100,49 @@ export default function HomePassageiro() {
       return;
     }
 
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setSubmitMessage({ type: 'error', text: 'Token de autenticação não encontrado.' });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // TODO: Integrar com API do backend
-      const response = await fetch('/api/corridas/solicitar', {
+      const response = await fetch(`${API_URL}/corrida`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          ...rideRequest,
-          tipo: 'passageiro',
-          timestamp: new Date().toISOString()
+          origemId: rideRequest.origemId,
+          destinoId: rideRequest.destinoId,
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setSubmitMessage({
-          type: 'success',
-          text: `Corrida solicitada! Procurando motoristas próximos... ID: ${data.corridaId || 'ABC123'}`
-        });
-
-        setRideRequest({
-          origem: '',
-          destino: '',
-          passageiros: 1
-        });
-
-        // TODO: Redirecionar para tela de acompanhamento da corrida
-        setTimeout(() => {
-          window.location.href = '/acompanhar-corrida'
-        }, 3000);
-
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erro ao solicitar corrida');
       }
 
+      const data = await response.json();
+      setSubmitMessage({
+        type: 'success',
+        text: 'Corrida solicitada! Redirecionando para acompanhamento...',
+      });
+
+      setRideRequest({ origemId: '', destinoId: '' });
+      router.push(`/acompanhar-corrida?id=${data.id}`);
     } catch (error) {
       console.error('Erro na solicitação:', error);
       setSubmitMessage({
         type: 'error',
-        text: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.'
+        text: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente.',
       });
     } finally {
       setIsSubmitting(false);
     }
-  }
-
-  const selectQuickDestination = (destination: string) => {
-    setRideRequest(prev => ({ ...prev, destino: destination }));
   }
 
   return (
@@ -154,20 +175,6 @@ export default function HomePassageiro() {
             Informe o trajeto e a gente conecta com motoristas locais em segundos.
           </p>
 
-          <div className="quick-destinations">
-            {quickDestinations.map((dest) => (
-              <button
-                key={dest.name}
-                className="destination-btn"
-                onClick={() => selectQuickDestination(dest.name)}
-              >
-                <div className="icon">
-                  <span role="img" aria-label="location">{dest.icon}</span>
-                </div>
-                <span>{dest.name}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="right-panel">
@@ -182,15 +189,19 @@ export default function HomePassageiro() {
               <div className="input-field">
                 <div className="icon origin">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="currentColor"/>
+                    <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="currentColor" />
                   </svg>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Onde você está?"
-                  value={rideRequest.origem}
-                  onChange={(e) => handleInputChange('origem', e.target.value)}
-                />
+                <select
+                  value={rideRequest.origemId === '' ? '' : String(rideRequest.origemId)}
+                  onChange={(e) => handleInputChange('origemId', e.target.value ? Number(e.target.value) : '')}
+                  disabled={isLoadingBairros}
+                >
+                  <option value="">Selecione a origem</option>
+                  {bairros.map((bairro) => (
+                    <option key={bairro.id} value={bairro.id}>{bairro.nome}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -199,57 +210,22 @@ export default function HomePassageiro() {
               <div className="input-field">
                 <div className="icon destination">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="currentColor"/>
+                    <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="currentColor" />
                   </svg>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Pra onde vai?"
-                  value={rideRequest.destino}
-                  onChange={(e) => handleInputChange('destino', e.target.value)}
-                />
+                <select
+                  value={rideRequest.destinoId === '' ? '' : String(rideRequest.destinoId)}
+                  onChange={(e) => handleInputChange('destinoId', e.target.value ? Number(e.target.value) : '')}
+                  disabled={isLoadingBairros}
+                >
+                  <option value="">Selecione o destino</option>
+                  {bairros.map((bairro) => (
+                    <option key={bairro.id} value={bairro.id}>{bairro.nome}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            <div className="form-group">
-              <label>QUANTIDADE DE PESSOAS</label>
-              <div className="passenger-count">
-                <div className="input-field">
-                  <div className="passenger-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" fill="currentColor"/>
-                      <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" fill="currentColor"/>
-                    </svg>
-                  </div>
-                  <span style={{ fontSize: '19px', fontWeight: '600', color: '#1F1F1F' }}>
-                    {rideRequest.passageiros}
-                  </span>
-                  <div className="count-controls">
-                    <button
-                      type="button"
-                      className="count-btn"
-                      onClick={() => handlePassengerChange(false)}
-                      disabled={rideRequest.passageiros <= 1}
-                    >
-                      <svg width="14" height="2" viewBox="0 0 14 2">
-                        <line x1="0" y1="1" x2="14" y2="1" stroke="currentColor" strokeWidth="2"/>
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      className="count-btn"
-                      onClick={() => handlePassengerChange(true)}
-                      disabled={rideRequest.passageiros >= 4}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 14 14">
-                        <line x1="7" y1="0" x2="7" y2="14" stroke="currentColor" strokeWidth="2"/>
-                        <line x1="0" y1="7" x2="14" y2="7" stroke="currentColor" strokeWidth="2"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {submitMessage && (
               <div style={{

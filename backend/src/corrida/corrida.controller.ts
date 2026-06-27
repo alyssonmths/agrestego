@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Put, Param} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Put, Param, Get } from '@nestjs/common';
 import { CorridaService } from './corrida.service';
 import { CreateCorridaDto } from './dto/create-corrida.dto';
 import { AvaliarCorridaPassageiroDto } from './dto/avaliar-corrida-passageiro.dto';
@@ -20,6 +20,15 @@ export class CorridaController {
   create(@Req() req: any, @Body() createCorridaDto: CreateCorridaDto) {
     const userId = req.user?.userId;
     return this.corridaService.create(createCorridaDto, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obter corrida por ID' })
+  @ApiResponse({ status: 200, description: 'Corrida encontrada' })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.corridaService.findOne(Number(id));
   }
 
   @UseGuards(JwtAuthGuard)

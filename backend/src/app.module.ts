@@ -7,6 +7,7 @@ import { PassageiroModule } from './passageiro/passageiro.module';
 import { AuthModule } from './auth/auth.module';
 import { MotoristaModule } from './motorista/motorista.module';
 import { CorridaModule } from './corrida/corrida.module';
+import { BairroModule } from './bairro/bairro.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CorridaModule } from './corrida/corrida.module';
     AuthModule,
     MotoristaModule,
     CorridaModule,
+    BairroModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
