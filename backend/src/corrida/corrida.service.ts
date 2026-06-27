@@ -98,4 +98,9 @@ export class CorridaService {
       }
     });
   }
+  async listar(){
+    return await this.prisma.corrida.findMany({
+      where: {status:StatusCorrida.SOLICITADA}
+    });
+  }
 }

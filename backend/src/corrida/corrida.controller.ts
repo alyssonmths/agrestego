@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Put, Param} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Put, Param, Get} from '@nestjs/common';
 import { CorridaService } from './corrida.service';
 import { CreateCorridaDto } from './dto/create-corrida.dto';
 import { AvaliarCorridaPassageiroDto } from './dto/avaliar-corrida-passageiro.dto';
@@ -56,6 +56,16 @@ export class CorridaController {
   finalizar(@Param("id") id: number) {
     return this.corridaService.finalizar(Number(id));
   }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Listar corridas solicitadas' })
+  @ApiResponse({status: 200, description: 'Lista de corridas'})
+  @Get()
+  Listar(){
+    return this.corridaService.listar();
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
