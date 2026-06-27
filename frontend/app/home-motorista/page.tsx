@@ -21,7 +21,6 @@ export default function HomeMotorista(){
     const data = await response.json();
     setCorridas(data);
 };
-
     const aceitarCorrida= async (id: number) =>{
         const token =localStorage.getItem("access_token");
         console.log(token);
@@ -74,7 +73,7 @@ export default function HomeMotorista(){
                             <span className="ponto-origem"></span>
                             <div>
                                 <small>Origem</small>
-                                <p>Bairro{corrida.origemId}</p>
+                                <p>Bairro {corrida.origem?.nome}</p>
                             </div>
 
                         </div>
@@ -82,7 +81,7 @@ export default function HomeMotorista(){
                             <span className="ponto-destino"></span>
                             <div>
                                 <small>Destino</small>
-                                <p>Bairro {corrida.destinoId}</p>
+                                <p>Bairro {corrida.destino?.nome}</p>
 
                             </div>
                         </div>   
