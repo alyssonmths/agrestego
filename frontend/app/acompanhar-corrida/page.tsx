@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import AuthGuard from '../components/AuthGuard'
 import './acompanhar-corrida.css'
@@ -45,12 +45,46 @@ type RideDetails = {
   avaliacao: Avaliacao | null
 }
 
-export default function AcompanharCorridaPage() {
+function AcompanharCorridaContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [ride, setRide] = useState<RideDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isPaying, setIsPaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<'CARTAO' | 'PIX' | 'DINHEIRO'>('CARTAO')
+  const [paymentMessage, setPaymentMessage] = useState<string | null>(null)
+
+  const refreshRide = async (rideId: string) => {
+    const token = localStorage.getItem('access_token')
+    if (!token) {
+      router.push('/')
+      return null
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/corrida/${rideId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message || 'Não foi possível carregar os detalhes da corrida.')
+      }
+
+      const data = await response.json()
+      setRide(data)
+      return data
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : 'Erro ao carregar detalhes da corrida.')
+      return null
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
     const id = searchParams.get('id')
@@ -60,37 +94,51 @@ export default function AcompanharCorridaPage() {
       return
     }
 
+    setIsLoading(true)
+    setError(null)
+    refreshRide(id)
+  }, [searchParams, router])
+
+  const handlePay = async () => {
+    const id = searchParams.get('id')
+    if (!id) {
+      setError('ID da corrida não informado.')
+      return
+    }
+
     const token = localStorage.getItem('access_token')
     if (!token) {
       router.push('/')
       return
     }
 
-    const loadRide = async () => {
-      try {
-        const response = await fetch(`${API_URL}/corrida/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+    setIsPaying(true)
+    setPaymentMessage(null)
 
-        if (!response.ok) {
-          const data = await response.json()
-          throw new Error(data.message || 'Não foi possível carregar os detalhes da corrida.')
-        }
+    try {
+      const response = await fetch(`${API_URL}/corrida/${id}/pagar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ metodo: paymentMethod }),
+      })
 
-        const data = await response.json()
-        setRide(data)
-      } catch (err) {
-        console.error(err)
-        setError(err instanceof Error ? err.message : 'Erro ao carregar detalhes da corrida.')
-      } finally {
-        setIsLoading(false)
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        throw new Error(data.message || 'Não foi possível realizar o pagamento.')
       }
-    }
 
-    loadRide()
-  }, [searchParams, router])
+      await refreshRide(id)
+      setPaymentMessage(`Pagamento realizado com sucesso via ${paymentMethod.toLowerCase()}.`)
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : 'Erro ao processar o pagamento.')
+    } finally {
+      setIsPaying(false)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -173,17 +221,50 @@ export default function AcompanharCorridaPage() {
               </div>
             )}
 
-            {ride.pagamento && (
+            {ride.status.toLowerCase() === 'finalizada' && (
               <div className="payment-card">
-                <h3>Pagamento</h3>
-                <p>Status: {ride.pagamento.status}</p>
-                <p>Valor: R$ {ride.pagamento.valor.toFixed(2)}</p>
-                <p>Método: {ride.pagamento.metodo ?? 'Não definido'}</p>
+                <div className="payment-card-header">
+                  <h3>Pagamento</h3>
+                  <div className="payment-actions">
+                    <select
+                      value={paymentMethod}
+                      onChange={(event) => setPaymentMethod(event.target.value as 'CARTAO' | 'PIX' | 'DINHEIRO')}
+                      disabled={isPaying || ride.pagamento?.status === 'PAGO'}
+                    >
+                      <option value="CARTAO">CARTÃO</option>
+                      <option value="PIX">PIX</option>
+                      <option value="DINHEIRO">DINHEIRO</option>
+                    </select>
+                    <button type="button" onClick={handlePay} disabled={isPaying || ride.pagamento?.status === 'PAGO'}>
+                      {isPaying ? 'Processando...' : 'PAGAR'}
+                    </button>
+                  </div>
+                </div>
+
+                {ride.pagamento ? (
+                  <>
+                    <p>Status: {ride.pagamento.status}</p>
+                    <p>Valor: R$ {ride.pagamento.valor.toFixed(2)}</p>
+                    <p>Método: {ride.pagamento.metodo ?? 'Não definido'}</p>
+                  </>
+                ) : (
+                  <p>Ainda não há informações de pagamento para esta corrida.</p>
+                )}
+
+                {paymentMessage && <p className="payment-message">{paymentMessage}</p>}
               </div>
             )}
           </div>
         </main>
       </div>
     </AuthGuard>
+  )
+}
+
+export default function AcompanharCorridaPage() {
+  return (
+    <Suspense fallback={<div className="acompanhar-corrida"><div className="ride-status-card"><p>Carregando...</p></div></div>}>
+      <AcompanharCorridaContent />
+    </Suspense>
   )
 }

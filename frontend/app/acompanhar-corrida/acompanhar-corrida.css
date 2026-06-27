@@ -121,6 +121,47 @@
   padding: 22px;
 }
 
+.payment-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.payment-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment-actions select,
+.payment-actions button {
+  border: 1px solid #E0D7CF;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.payment-actions select {
+  background-color: white;
+  color: #1F1F1F;
+  min-width: 140px;
+}
+
+.payment-actions button {
+  background-color: #2F6B4F;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.payment-actions button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .driver-card h3,
 .payment-card h3 {
   margin: 0 0 12px;
@@ -133,6 +174,12 @@
   margin: 4px 0;
   color: #444444;
   font-size: 15px;
+}
+
+.payment-message {
+  margin-top: 12px;
+  color: #2F6B4F;
+  font-weight: 600;
 }
 
 .pending-card {
@@ -157,5 +204,15 @@
 
   .ride-info-grid {
     grid-template-columns: 1fr;
+  }
+
+  .payment-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .payment-actions {
+    width: 100%;
+    flex-wrap: wrap;
   }
 }
