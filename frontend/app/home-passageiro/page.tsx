@@ -163,7 +163,7 @@ export default function HomePassageiro() {
       <main className="main-content">
         <div className="left-panel">
           <div className="greeting-badge">
-            <p>🌞 {getGreeting()}, MARIA</p>
+            <p>🌞 {getGreeting()} </p>
           </div>
 
           <h1 className="main-headline">
