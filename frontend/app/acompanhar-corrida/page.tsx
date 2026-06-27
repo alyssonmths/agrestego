@@ -54,6 +54,11 @@ function AcompanharCorridaContent() {
   const [error, setError] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<'CARTAO' | 'PIX' | 'DINHEIRO'>('CARTAO')
   const [paymentMessage, setPaymentMessage] = useState<string | null>(null)
+  const [reviewCorrida, setReviewCorrida] = useState<number>(0)
+  const [reviewMotorista, setReviewMotorista] = useState<number>(0)
+  const [reviewMessage, setReviewMessage] = useState<string | null>(null)
+  const [reviewError, setReviewError] = useState<string | null>(null)
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
 
   const refreshRide = async (rideId: string) => {
     const token = localStorage.getItem('access_token')
@@ -76,6 +81,15 @@ function AcompanharCorridaContent() {
 
       const data = await response.json()
       setRide(data)
+
+      if (data.avaliacao) {
+        setReviewCorrida(data.avaliacao.notaCorrida ?? 0)
+        setReviewMotorista(data.avaliacao.notaMotorista ?? 0)
+      } else {
+        setReviewCorrida(0)
+        setReviewMotorista(0)
+      }
+
       return data
     } catch (err) {
       console.error(err)
@@ -140,6 +154,57 @@ function AcompanharCorridaContent() {
     }
   }
 
+  const handleSubmitReview = async () => {
+    const id = searchParams.get('id')
+    if (!id) {
+      setReviewError('ID da corrida não informado.')
+      return
+    }
+
+    const token = localStorage.getItem('access_token')
+    if (!token) {
+      router.push('/')
+      return
+    }
+
+    if (reviewCorrida < 1 || reviewMotorista < 1) {
+      setReviewError('Selecione as duas notas antes de enviar sua avaliação.')
+      return
+    }
+
+    setIsSubmittingReview(true)
+    setReviewMessage(null)
+    setReviewError(null)
+
+    try {
+      const response = await fetch(`${API_URL}/corrida/avaliar-passageiro`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          corridaId: Number(id),
+          notaCorrida: reviewCorrida,
+          notaMotorista: reviewMotorista,
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        throw new Error(data.message || 'Não foi possível enviar a avaliação.')
+      }
+
+      await refreshRide(id)
+      setReviewMessage('Avaliação enviada com sucesso. Obrigado pelo feedback!')
+    } catch (err) {
+      console.error(err)
+      setReviewError(err instanceof Error ? err.message : 'Erro ao enviar a avaliação.')
+    } finally {
+      setIsSubmittingReview(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <AuthGuard>
@@ -164,6 +229,10 @@ function AcompanharCorridaContent() {
     )
   }
 
+  const reviewSubmitted = Boolean(
+    ride.avaliacao?.notaCorrida != null && ride.avaliacao?.notaMotorista != null
+  )
+
   return (
     <AuthGuard>
       <div className="acompanhar-corrida">
@@ -178,7 +247,7 @@ function AcompanharCorridaContent() {
           </div>
         </header>
 
-        <main className="detail-content">
+        <main className={`detail-content${ride.status.toLowerCase() === 'finalizada' ? ' with-review' : ''}`}>
           <div className="ride-status-card">
             <div className="status-header">
               <h2>Status atual</h2>
@@ -255,6 +324,69 @@ function AcompanharCorridaContent() {
               </div>
             )}
           </div>
+
+          {ride.status.toLowerCase() === 'finalizada' && (
+            <div className="review-card">
+              <h3>Avaliação da corrida</h3>
+              <p>Como foi sua viagem?</p>
+
+              <div className="review-rating-group">
+                <span>Nota corrida</span>
+                <div className="review-stars">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={`corrida-${star}`}
+                      type="button"
+                      className={`review-star ${reviewCorrida >= star ? 'selected' : ''}`}
+                      onClick={() => !reviewSubmitted && setReviewCorrida(star)}
+                      disabled={reviewSubmitted}
+                      aria-label={`Nota corrida ${star} estrela${star > 1 ? 's' : ''}`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="review-rating-group">
+                <span>Nota motorista</span>
+                <div className="review-stars">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={`motorista-${star}`}
+                      type="button"
+                      className={`review-star ${reviewMotorista >= star ? 'selected' : ''}`}
+                      onClick={() => !reviewSubmitted && setReviewMotorista(star)}
+                      disabled={reviewSubmitted}
+                      aria-label={`Nota motorista ${star} estrela${star > 1 ? 's' : ''}`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {reviewSubmitted ? (
+                <div className="review-summary">
+                  <p>Avaliação registrada</p>
+                  <p>Nota corrida: {ride.avaliacao?.notaCorrida ?? '—'}</p>
+                  <p>Nota motorista: {ride.avaliacao?.notaMotorista ?? '—'}</p>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="review-submit-button"
+                  onClick={handleSubmitReview}
+                  disabled={isSubmittingReview}
+                >
+                  {isSubmittingReview ? 'Enviando...' : 'Enviar avaliação'}
+                </button>
+              )}
+
+              {reviewMessage && <p className="review-message">{reviewMessage}</p>}
+              {reviewError && <p className="review-error">{reviewError}</p>}
+            </div>
+          )}
         </main>
       </div>
     </AuthGuard>
