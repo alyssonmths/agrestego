@@ -1,0 +1,82 @@
+.corrida-andamento {
+    min-height: 100vh;
+    background: #f8f4f0;
+    font-family: Arial, sans-serif;
+}
+
+.corrida-andamento .header-perfil {
+    background: #FFFFFF;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e8e4df;
+}
+
+.corrida-andamento .logo img {
+    height: 42px;
+    width: auto;
+    display: block;
+}
+
+.corrida-andamento .links {
+    display: flex;
+    gap: 12px;
+}
+
+.corrida-andamento .links a {
+    padding: 10px 24px;
+    border-radius: 50px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #D94f2b;
+    font-size: 15px;
+}
+.andamento-content {
+    padding: 40px 60px;
+}
+
+.andamento-content h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #1F1F1F;
+    margin-bottom: 8px;
+}
+
+.andamento-content p {
+    font-size: 16px;
+    color: #777;
+    margin-bottom: 40px;
+}
+
+.corrida-card-andamento {
+    background: white;
+    border-radius: 16px;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    min-height: 400px;
+}
+
+.corrida-card-andamento p {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1F1F1F;
+    margin: 0;
+}
+
+.btn-finalizar {
+    padding: 22px 100px;
+    background: #E05A3A;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    max-width: 500px;
+}

@@ -23,7 +23,6 @@ export default function HomeMotorista(){
 };
     const aceitarCorrida= async (id: number) =>{
         const token =localStorage.getItem("access_token");
-        console.log(token);
         const response = await fetch(`http://localhost:3000/corrida/${id}/aceitar`,{
             method: "PUT",
             headers:{
@@ -31,19 +30,9 @@ export default function HomeMotorista(){
             },
         });
         const data = await response.json(); 
-        console.log(data);
-    }
-    const finalizaCorrida= async (id: number) =>{
-        const token =localStorage.getItem("access_token");
-        console.log(token);
-        const response =await fetch(`http://localhost:3000/corrida/${id}/finalizar`,{
-            method: "PUT",
-            headers:{
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        const data = await response.json(); 
-        console.log(data);
+        if (data.id){
+            window.location.href=`/corrida-em-andamento/${data.id}`;
+        }
     }
     return(
       <AuthGuard>
