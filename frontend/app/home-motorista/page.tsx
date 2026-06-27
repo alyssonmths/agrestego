@@ -4,13 +4,21 @@ import "./home-motorista.css";
 import Link from "next/link";
 import AuthGuard from "../components/AuthGuard";
 import {useState, useEffect} from "react";
-import showToast from "../components/showToast";
+import Toast from "../components/Toast";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 
 export default function HomeMotorista(){
     const [corridas, setCorridas] = useState<any[]>([]);
+    const [toast, setToast] = useState<{ visible: boolean; type: 'success' | 'error'; message: string }>({
+        visible: false,
+        type: 'success',
+        message: '',
+    });
+    function showToast(type: 'success' | 'error', message: string) {
+        setToast({ visible: true, type, message });
+    }
     useEffect(() => {
         buscarCorridas();
     }, []);
@@ -36,7 +44,7 @@ export default function HomeMotorista(){
         try{
             const data = await response.json();
             if (data?.id){
-                showToast('Corrida aceita com sucesso');
+                showToast('success', 'Corrida aceita com sucesso');
                 // give user a moment to see toast, then navigate
                 setTimeout(() => {
                     window.location.href = `/corrida-em-andamento/${data.id}`;
@@ -45,7 +53,7 @@ export default function HomeMotorista(){
         } catch (e) {
             // fallback: if no body but success status, navigate
             if (response.ok) {
-                showToast('Corrida aceita com sucesso');
+                showToast('success', 'Corrida aceita com sucesso');
                 setTimeout(() => {
                     window.location.href = `/corrida-em-andamento/${id}`;
                 }, 700);
@@ -102,6 +110,12 @@ export default function HomeMotorista(){
                 </article>
             ))}
               </section>
+                            <Toast
+                                visible={toast.visible}
+                                type={toast.type}
+                                message={toast.message}
+                                onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+                        />
               </div>
       </AuthGuard>
         );
