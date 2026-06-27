@@ -7,6 +7,21 @@ import {useState, useEffect} from "react";
 
 
 export default function HomeMotorista(){
+    const [corridas, setCorridas] = useState<any[]>([]);
+    useEffect(() => {
+        buscarCorridas();
+    }, []);
+    const buscarCorridas = async () => {
+        const token = localStorage.getItem("access_token");
+        const response = await fetch("http://localhost:3000/corrida", {
+            headers:{
+                Authorization: `Bearer ${token}`,
+            }
+    });
+    const data = await response.json();
+    setCorridas(data);
+};
+
     const aceitarCorrida= async (id: number) =>{
         const token =localStorage.getItem("access_token");
         console.log(token);
@@ -51,40 +66,37 @@ export default function HomeMotorista(){
             <span className="badge-online">● Online</span>
             </div>
 
-            <section className="corridas-lista">
-                <article className="card-corridas">
+           <section className="corridas-lista">
+            {corridas.map((corrida) => (
+                <article key={corrida.id} className="card-corridas">
                     <div className="card-info">
                         <div className="ponto-linha">
                             <span className="ponto-origem"></span>
                             <div>
-                                <small>ORIGEM</small>
-                                <p>Centro, Caruaru</p>
+                                <small>Origem</small>
+                                <p>Bairro{corrida.origemId}</p>
                             </div>
+
                         </div>
-                         <div className="ponto-linha">
-                <span className="ponto-destino"></span>
-                <div>
-                    <small>DESTINO</small>
-                    <p>Universidade FAVIP</p>
-                </div>
-            </div>
-            <div className="card-badges">
-                <span className="badge-info">1 pessoa</span>
-                <span className="badge-info">4.2 km</span>
-                <span className="badge-preco">R$ 14,50</span>
-            </div>
-        </div>
-        <div className="card-corrida-acoes">
-           
-            <button className="btn-aceitar"
-            onClick={() => aceitarCorrida(14)}
-            >Aceitar</button>
-   
+                        <div className="ponto-linha">
+                            <span className="ponto-destino"></span>
+                            <div>
+                                <small>Destino</small>
+                                <p>Bairro {corrida.destinoId}</p>
+
+                            </div>
+                        </div>   
+                        <div className="card-badges">
+                            <span className="badge-valor">R$ {corrida.valor}</span>
+                            </div>    
+                    </div>
+                    <div className="card-corrida-acoes">
+                        <button className="btn-aceitar" onClick={() => aceitarCorrida(corrida.id)}>Aceitar</button>
                     </div>
                 </article>
-                
-                 </section>
-            </div>
+            ))}
+              </section>
+              </div>
       </AuthGuard>
         );
 }
