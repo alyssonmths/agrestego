@@ -68,6 +68,16 @@ export class CorridaController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Listar corridas solicitadas' })
+  @ApiResponse({status: 200, description: 'Lista de corridas'})
+  @Get()
+  Listar(){
+    return this.corridaService.listar();
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Pagar corrida' })
   @ApiResponse({ status: 200, description: 'Pagamento registrado' })
   @Post(":id/pagar")

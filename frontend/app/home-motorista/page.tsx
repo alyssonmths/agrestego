@@ -3,8 +3,34 @@
 import "./home-motorista.css";
 import Link from "next/link";
 import AuthGuard from "../components/AuthGuard";
+import {useState, useEffect} from "react";
+
 
 export default function HomeMotorista(){
+    const aceitarCorrida= async (id: number) =>{
+        const token =localStorage.getItem("access_token");
+        console.log(token);
+        const response = await fetch(`http://localhost:3000/corrida/${id}/aceitar`,{
+            method: "PUT",
+            headers:{
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json(); 
+        console.log(data);
+    }
+    const finalizaCorrida= async (id: number) =>{
+        const token =localStorage.getItem("access_token");
+        console.log(token);
+        const response =await fetch(`http://localhost:3000/corrida/${id}/finalizar`,{
+            method: "PUT",
+            headers:{
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json(); 
+        console.log(data);
+    }
     return(
       <AuthGuard>
          <div className="perfil-passageiro">
@@ -14,7 +40,6 @@ export default function HomeMotorista(){
                 </div>
                 <nav className="links">
                 <Link href={"/"}>Início</Link>
-                <Link href={"corridas"}>Corridas</Link>
                 <Link href={"perfil"}>Perfil</Link>
                 </nav>
             </header>
@@ -50,8 +75,10 @@ export default function HomeMotorista(){
             </div>
         </div>
         <div className="card-corrida-acoes">
-            <button className="btn-aceitar">Aceitar</button>
-            <button className="btn-rejeitar">Rejeitar</button>
+           
+            <button className="btn-aceitar"
+            onClick={() => aceitarCorrida(14)}
+            >Aceitar</button>
    
                     </div>
                 </article>
