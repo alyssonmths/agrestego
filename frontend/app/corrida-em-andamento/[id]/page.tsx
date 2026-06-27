@@ -3,6 +3,9 @@ import AuthGuard from "../../components/AuthGuard";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import "./corrida-em-andamento.css";
+import showToast from "@/app/components/showToast";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 export default function CorridaEmAndamento(){
     const params = useParams();
@@ -10,15 +13,19 @@ export default function CorridaEmAndamento(){
 
     const finalizarCorrida = async () => {
         const token = localStorage.getItem("access_token");
-        const response = await fetch(`http://localhost:3000/corrida/${id}/finalizar`,{
+        const response = await fetch(`${API_URL}/corrida/${id}/finalizar`,{
             method: "PUT",
             headers:{
                 Authorization: `Bearer ${token}`,
             },
         });
-        const data = await response.json();
-        if(data){
-            window.location.href = "/home-motorista";
+        if (response.ok) {
+            showToast('Corrida finalizada com sucesso');
+            setTimeout(() => {
+                window.location.href = "/home-motorista";
+            }, 700);
+        } else {
+            console.error('Falha ao finalizar corrida', response.status);
         }
     }
 

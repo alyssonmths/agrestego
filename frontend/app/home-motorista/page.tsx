@@ -4,6 +4,9 @@ import "./home-motorista.css";
 import Link from "next/link";
 import AuthGuard from "../components/AuthGuard";
 import {useState, useEffect} from "react";
+import showToast from "../components/showToast";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 
 export default function HomeMotorista(){
@@ -13,25 +16,40 @@ export default function HomeMotorista(){
     }, []);
     const buscarCorridas = async () => {
         const token = localStorage.getItem("access_token");
-        const response = await fetch("http://localhost:3000/corrida", {
+        const response = await fetch(`${API_URL}/corrida`, {
             headers:{
                 Authorization: `Bearer ${token}`,
             }
-    });
-    const data = await response.json();
-    setCorridas(data);
-};
+        });
+        const data = await response.json();
+        setCorridas(data);
+    };
     const aceitarCorrida= async (id: number) =>{
         const token =localStorage.getItem("access_token");
-        const response = await fetch(`http://localhost:3000/corrida/${id}/aceitar`,{
+        const response = await fetch(`${API_URL}/corrida/${id}/aceitar`,{
             method: "PUT",
             headers:{
                 Authorization: `Bearer ${token}`,
             },
         });
-        const data = await response.json(); 
-        if (data.id){
-            window.location.href=`/corrida-em-andamento/${data.id}`;
+        // endpoint returns corrida when accepted; if it does, redirect and show toast
+        try{
+            const data = await response.json();
+            if (data?.id){
+                showToast('Corrida aceita com sucesso');
+                // give user a moment to see toast, then navigate
+                setTimeout(() => {
+                    window.location.href = `/corrida-em-andamento/${data.id}`;
+                }, 700);
+            }
+        } catch (e) {
+            // fallback: if no body but success status, navigate
+            if (response.ok) {
+                showToast('Corrida aceita com sucesso');
+                setTimeout(() => {
+                    window.location.href = `/corrida-em-andamento/${id}`;
+                }, 700);
+            }
         }
     }
     return(
