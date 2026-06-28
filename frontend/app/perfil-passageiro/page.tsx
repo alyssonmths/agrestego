@@ -148,7 +148,7 @@ export default function PerfilPassageiro() {
                 const token = localStorage.getItem('access_token');
                 if (!token) return;
 
-                // Fetch profile data
+                // Requisitar dados do perfil do passageiro
                 const profileRes = await fetch(`${API_URL}/passageiro`, {
                     method: 'GET',
                     headers: { Authorization: `Bearer ${token}` },
@@ -164,7 +164,7 @@ export default function PerfilPassageiro() {
                     }));
                 }
 
-                // Fetch saved addresses
+                // Requisitar endereços salvos
                 try {
                     const addrRes = await fetch(`${API_URL}/passageiro/enderecos`, {
                         method: 'GET',
@@ -175,10 +175,10 @@ export default function PerfilPassageiro() {
                         setEnderecos(list || []);
                     }
                 } catch (e) {
-                    // ignore
+                    // ignorar
                 }
 
-                // Fetch profile image
+                // Requisitar imagem de perfil
                 const res = await fetch(`${API_URL}/passageiro/image`, {
                     method: 'GET',
                     headers: { Authorization: `Bearer ${token}` },
@@ -192,7 +192,7 @@ export default function PerfilPassageiro() {
                 prevObjectUrlRef.current = url;
                 setProfileImageUrl(url);
             } catch (err) {
-                // silently ignore
+                // ignorar
             }
         }
 
@@ -372,7 +372,7 @@ export default function PerfilPassageiro() {
                     </div>
                     <nav className="links">
                         <Link href={"/home-passageiro"}>Início</Link>
-                        <Link href={"corridas"}>Corridas</Link>
+                        <Link href={"/corridas-finalizadas-passageiro"}>Corridas</Link>
                         <Link href={"/perfil-passageiro"}>Perfil</Link>
                     </nav>
                 </header>

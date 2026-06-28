@@ -85,7 +85,7 @@ export default function CorridasPage() {
 
           <nav className="nav-links">
             <Link href="/home-passageiro" className="nav-link">Início</Link>
-            <Link href="/corridas" className="nav-link active">Corridas</Link>
+            <Link href="/corridas-finalizadas-passageiro" className="nav-link active">Corridas</Link>
             <Link href="/perfil-passageiro" className="nav-link">Perfil</Link>
           </nav>
         </header>

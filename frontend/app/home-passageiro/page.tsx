@@ -155,7 +155,7 @@ export default function HomePassageiro() {
 
         <nav className="nav-links">
           <Link href="/home-passageiro" className="nav-link active">Início</Link>
-          <Link href="/corridas" className="nav-link">Corridas</Link>
+          <Link href="/corridas-finalizadas-passageiro" className="nav-link">Corridas</Link>
           <Link href="/perfil-passageiro" className="nav-link">Perfil</Link>
         </nav>
       </header>
