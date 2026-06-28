@@ -69,7 +69,6 @@ export default function HomeMotorista(){
                 </div>
                 <nav className="links">
                 <Link href={"/"}>Início</Link>
-                <Link href={"perfil"}>Perfil</Link>
                 </nav>
             </header>
             <div className="titulo-perfil">

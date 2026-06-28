@@ -334,4 +334,16 @@
     width: 100%;
     flex-wrap: wrap;
   }
+  .btn-voltar-inicio {
+    margin-top: 16px;
+    width: 100%;
+    padding: 14px;
+    background: #3a9e5f;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
 }
