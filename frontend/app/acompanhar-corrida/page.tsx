@@ -292,7 +292,7 @@ function AcompanharCorridaContent() {
 
             {ride.status.toLowerCase() === 'finalizada' && (
               <div className="payment-card">
-                {ride.status.toLowerCase()=== 'PAGO'&&(
+                {ride.pagamento?.status === 'PAGO'&&(
                   <button type="button"
                 className="btn-voltar-inicio"
                 onClick={() => window.location.href= '/home-passageiro'}>
