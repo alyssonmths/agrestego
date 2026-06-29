@@ -1,119 +1,208 @@
-# 🚗 AgresteGo
+# 🚖 AgresteGo
 
-Sistema acadêmico de mobilidade urbana inspirado em aplicativos como
-Uber, desenvolvido para a disciplina de Desenvolvimento Web.
+O **AgresteGo** é uma plataforma acadêmica de mobilidade urbana inspirada em serviços de transporte como Uber, desenvolvida para a disciplina de Desenvolvimento Web. O projeto conecta passageiros e motoristas para a realização de corridas dentro da cidade de Surubim, oferecendo cadastro, autenticação, solicitação de corridas, acompanhamento de status e gestão de pagamentos e avaliações.
 
-## 📍 Descrição
+---
 
-O **AgresteGo** é uma plataforma que conecta passageiros e motoristas
-para realização de corridas dentro da cidade de Surubim. O sistema
-permite solicitar, gerenciar e aceitar corridas de forma prática e
-eficiente.
+# 📖 Visão Geral
 
-------------------------------------------------------------------------
+Este sistema foi pensado como uma aplicação full-stack com:
 
-## 🛠️ Tecnologias Utilizadas
+* 🌐 Frontend em **Next.js** para a experiência do usuário
+* ⚙️ Backend em **NestJS** para a API REST e regras de negócio
+* 🗄️ **Prisma ORM** para modelagem e acesso ao banco de dados
+* 🐘 **PostgreSQL** com **Supabase** como infraestrutura de persistência
+* 🔐 Autenticação baseada em **JWT** para proteção das rotas
 
-### Frontend
+---
 
--   Next.js
+# ✨ Funcionalidades Principais
 
-### Backend
+## 👤 Passageiro
 
--   NestJS
--   Prisma ORM
+* Cadastro e login
+* Solicitação de corridas
+* Cadastro e gerenciamento de endereços
+* Acompanhamento do status da corrida
+* Visualização do histórico de corridas finalizadas
+* Pagamento e avaliação da corrida
 
-### Banco de Dados
+## 🚗 Motorista
 
--   PostgreSQL (Supabase)
+* Cadastro e login
+* Aceitação ou rejeição de corridas solicitadas
+* Finalizar corridas
 
-------------------------------------------------------------------------
+---
 
-## 👥 Funcionalidades
+# 🛠️ Tecnologias Utilizadas
 
-### Passageiro
+## 🌐 Frontend
 
--   Solicitar corridas
--   Editar perfil
--   Visualizar histórico de corridas
--   Acompanhar status da corrida
+* Next.js 16
+* React 19
+* TypeScript
 
-### Motorista
+## ⚙️ Backend
 
--   Buscar corridas disponíveis
--   Aceitar ou rejeitar corridas
--   Consultar histórico de corridas
--   Editar perfil
--   Atualizar status (disponível/ocupado)
+* NestJS 11
+* TypeScript
+* Prisma ORM 7
+* Passport + JWT
+* Swagger para documentação da API
+* Class Validator / Class Transformer
 
-------------------------------------------------------------------------
+## 🗄️ Banco de Dados
 
-## 🔐 Autenticação e Segurança
+* PostgreSQL
+* Supabase
 
--   Sistema de login e cadastro para motoristas e passageiros
--   Validação de dados
--   Proteção de rotas no backend
+---
 
-------------------------------------------------------------------------
+# 🏗️ Arquitetura do Sistema
 
-## 📡 Arquitetura do Sistema
+A aplicação segue uma arquitetura cliente-servidor simples e organizada:
 
--   API RESTful construída com NestJS
--   ORM Prisma para comunicação com banco de dados
--   Integração com Supabase para hospedagem do banco
+* 🎨 **Frontend:** interface web para passageiros e motoristas
+* ⚙️ **Backend:** API REST com módulos separados para autenticação, passageiros, motoristas, corridas e bairros
+* 🗄️ **Banco de dados:** modelo relacional com entidades como Passageiro, Motorista, Corrida, Endereço, Pagamento, Avaliação e Imagem
 
-------------------------------------------------------------------------
+---
 
-## 🚀 Como Executar o Projeto
+# 📚 Documentação e Materiais
 
-### Pré-requisitos
+* 📄 Documentação da API Swagger: http://localhost:3000/docs
+* 🎨 Protótipos e telas no Figma: https://www.figma.com/design/goQyAaFmdQcBa35T5EaNGk/Agreste-Go---Design?node-id=0-1&t=lIILLzCSBzuWoIY7-1
+* 📑 Diagramas de caso de uso: `docs/diagrama_casos_uso_v3.pdf`
+* 🧩 Diagrama de classes do backend: `docs/diagrama_classes_backend.png`
+* 🧩 Diagrama de classes do frontend: `docs/diagrama_classes_frontend.png`
 
--   Node.js instalado
--   PostgreSQL ou conta no Supabase
+---
 
-### Backend
+# 📂 Estrutura do Projeto
 
-``` bash
-cd backend
-npm install
-npx prisma migrate dev
-npm run start
+```text
+backend/   -> API NestJS, módulos, DTOs, autenticação e integração com Prisma
+frontend/  -> Aplicação Next.js
+docs/      -> Arquivos de documentação e diagramas
+figma/     -> Assets e telas exportadas
 ```
 
-### Frontend
+---
 
-``` bash
-cd frontend
+# 📋 Pré-requisitos
+
+Antes de executar o projeto, certifique-se de possuir:
+
+* Node.js 18 ou superior
+* npm
+* PostgreSQL ou uma instância no Supabase
+
+---
+
+# Como Executar Localmente
+
+## 1️⃣ Clone o repositório
+
+```bash
+git clone <url-do-repositorio>
+cd agrestego
+```
+
+---
+
+## 2️⃣ Configure o Backend
+
+```bash
+cd backend
 npm install
+```
+
+Crie um arquivo `.env`:
+
+```env
+DATABASE_URL="postgresql://usuario:senha@host:5432/banco"
+DIRECT_URL="postgresql://usuario:senha@host:5432/banco"
+JWT_SECRET_KEY="uma-chave-secreta-forte"
+CORS_ORIGIN="http://localhost:3001"
+```
+
+Execute as migrações:
+
+```bash
+npx prisma migrate dev
+```
+
+Inicie o servidor:
+
+```bash
+npm run start:dev
+```
+
+O backend ficará disponível em:
+
+* http://localhost:3000
+* Swagger: http://localhost:3000/docs
+
+---
+
+## 3️⃣ Configure o Frontend
+
+```bash
+cd ../frontend
+npm install
+```
+
+Crie um arquivo `.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+Inicie o frontend:
+
+```bash
 npm run dev
 ```
 
-------------------------------------------------------------------------
+A aplicação ficará disponível em:
 
-## 📌 Melhorias Futuras
+* http://localhost:3001
 
--   Implementação de geolocalização em tempo real
--   Sistema de pagamento integrado
--   Avaliação de motoristas e passageiros
--   Notificações em tempo real (WebSockets)
+---
 
-------------------------------------------------------------------------
+# 🔒 Autenticação e Segurança
 
-## 📚 Objetivo Acadêmico
+* Login e cadastro para passageiros e motoristas
+* Proteção das rotas utilizando JWT
+* Validação de dados com DTOs
+* Controle de acesso por papéis (Passageiro e Motorista)
 
-Este projeto tem como objetivo aplicar conceitos de desenvolvimento web
-moderno, incluindo: - Arquitetura cliente-servidor - Consumo de APIs -
-Modelagem de banco de dados - Autenticação e segurança
+---
 
-------------------------------------------------------------------------
+# ☁️ Deploy
 
-##  Figma
+O serviço de hospedagem e deploy escolhido foi o Railway.
 
-As telas em png encontram-se no diretório /figma para acesso rápido.
-Para acesso completo, acesse o link:
+* Frontend: Railway
+* Backend: Railway
 
-https://www.figma.com/design/goQyAaFmdQcBa35T5EaNGk/Agreste-Go---Design?node-id=0-1&t=lIILLzCSBzuWoIY7-1
+**Link do sistema:**
 
-## Diagrama de casos de uso
+Acesse o AgresteGo [aqui](https://frontend-production-41b0.up.railway.app/)
 
-O diagrama de casos de uso pode ser acessado [aqui](./casos_uso/diagrama_casos_uso.pdf).
+---
+
+# 🎓 Objetivo Acadêmico
+
+Este projeto foi desenvolvido com foco na aplicação prática de conceitos modernos de desenvolvimento web, incluindo:
+
+* Arquitetura cliente-servidor
+* Consumo de APIs REST
+* Modelagem de banco de dados relacional
+* Autenticação e segurança
+* Desenvolvimento Full Stack utilizando tecnologias atuais
+
+---
+
+Projeto desenvolvido para a disciplina de **Desenvolvimento Web**, com fins acadêmicos.
