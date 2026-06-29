@@ -236,6 +236,18 @@ function AcompanharCorridaContent() {
   return (
     <AuthGuard>
       <div className="acompanhar-corrida">
+        {ride.status.toLowerCase() === 'finalizada' && ride.pagamento?.status === 'PAGO' && (
+          <div className="top-actions">
+            <button
+              type="button"
+              className="btn-voltar-inicio"
+              onClick={() => (window.location.href = '/home-passageiro')}
+            >
+              Voltar ao início
+            </button>
+          </div>
+        )}
+
         <header className="header-acompanhar">
           <div className="logo-section">
             <img src="/logos/2-removebg-preview.png" alt="Logotipo AgresteGo" />
@@ -292,14 +304,6 @@ function AcompanharCorridaContent() {
 
             {ride.status.toLowerCase() === 'finalizada' && (
               <div className="payment-card">
-                {ride.pagamento?.status === 'PAGO'&&(
-                  <button type="button"
-                className="btn-voltar-inicio"
-                onClick={() => window.location.href= '/home-passageiro'}>
-                  Voltar ao inicio
-                </button>
-                )}
-                
                 <div className="payment-card-header">
                   <h3>Pagamento</h3>
                   <div className="payment-actions">

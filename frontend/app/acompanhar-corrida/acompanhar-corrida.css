@@ -336,15 +336,32 @@
   }
 }
 
+.top-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
 .btn-voltar-inicio {
-    margin-top: 16px;
-    width: 100%;
-    padding: 14px;
-    background: #3a9e5f;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-  }
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #1f1f1f;
+  border: 1px solid rgba(31, 31, 31, 0.12);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  opacity: 0.92;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-voltar-inicio:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.btn-voltar-inicio:active {
+  transform: translateY(0);
+}
