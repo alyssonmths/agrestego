@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCorridaDto } from './dto/create-corrida.dto';
 import { AvaliarCorridaPassageiroDto } from './dto/avaliar-corrida-passageiro.dto';
 import { AvaliarCorridaMotoristaDto } from './dto/avaliar-corrida-motorista.dto';
@@ -111,8 +111,14 @@ export class CorridaService {
   }
 
   async pagar(id: number, request: PagarCorridaDto) {
-    const corrida = await this.prisma.corrida.findUnique({ where: { id: Number(id) } });
+    const corrida = await this.prisma.corrida.findUnique({
+      where: { id: Number(id) },
+      include: { pagamento: true },
+    });
     if (!corrida) throw new NotFoundException('Corrida não encontrada');
+    if (corrida.pagamento?.status === StatusPagamento.PAGO) {
+      throw new BadRequestException('Pagamento da corrida já foi realizado');
+    }
 
     return await this.prisma.pagamento.update({
       data: {
